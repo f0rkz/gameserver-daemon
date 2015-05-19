@@ -12,12 +12,17 @@ config_file = "server.conf"
 steamcmd_download = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 
 def steamcmd_update(myappid, mysteamcmdpath, mypath, mylogin, mypassword):
-	steamcmd_run = mysteamcmdpath + "steamcmd.sh +login " + mylogin + " " + mypassword + " +force_install_dir " + mypath + " +app_update " + myappid + " validate +quit"
+	steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=mysteamcmdpath, login=mylogin, password=mypassword, installdir=mypath, id=myappid)
 	return steamcmd_run
+
+def srcds_launch():
+	thing = "thing"
+	return thing
 
 if os.path.isfile(config_file):
 	#load configuration objects here
 	parser.read(config_file)
+
 	# Parse configuration to variables
 	appid = parser.get("gameserver", "appid")
 	path = parser.get("gameserver", "path")
@@ -37,11 +42,11 @@ else:
 	if appid == '':
 		sys.exit("No appid given. Please supply an appid.")
 
-	path = raw_input("Gameserver Install Path (with trailing slash): [/home/steam/" + appid + "] ")
+	path = raw_input("Gameserver Install Path (with trailing slash): [/home/steam/{}/".format(appid))
 	if path == '':
-		path = "/home/steam/" + appid + "/"
+		path = '/home/steam/{}/'.format(appid)
 
-	gameserver_name = raw_input("Gameserver name IE: csgo: [" + appid + "] ")
+	gameserver_name = raw_input("Gameserver name IE: csgo: [{}]".format(appid))
 	if gameserver_name == '':
 		gameserver_name = appid
 
@@ -84,15 +89,16 @@ else:
 
 	# Write the configuration file
 	parser.write(open(config_file, 'w'))
-	print "Configuration file saved as " + config_file
+	print "Configuration file saved as {}".format(config_file)
 
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
 # Check if steamcmd is installed, if not, run it.
-if os.path.isfile(path + "steamcmd.sh"):
+INSTALL_DIR = os.path.dirname(path)
+if os.path.isfile(os.path.join(INSTALL_DIR, 'steamcmd.sh')):
 	#Steamcmd is installed in the install path
 	print "steamcmd is installed. Updating gameserver files. This may take a while..."
-	subprocess.call(steamcmd_update(appid, path, path + gameserver_name , steam_login, steam_password), shell=True)
+	subprocess.call(steamcmd_update(appid, path, os.path.join(path, gameserver_name), steam_login, steam_password), shell=True)
 
 else:
 	#Download steamcmd and extract it
@@ -107,6 +113,6 @@ print "All done installing/updating gameserver files. Launching the server."
 if gameserver_daemon == "srcds_run":
 	# Gameserver is srcds based. This part is easy.
 	exit()
-elif gameserver_daemon == "whatever_killing_floor_is":
-	# Gameserver is killing floor. Need to do up a custom command here.
+elif gameserver_daemon == "whatever_killing_floor_2_is":
+	# Gameserver is killing floor 2. Need to do up a custom command here.
 	exit()
