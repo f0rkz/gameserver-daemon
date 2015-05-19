@@ -4,7 +4,7 @@ import ConfigParser
 import tarfile
 import urllib
 import subprocess
-import screenutils
+from screenutils import list_screens, Screen
 
 parser = ConfigParser.SafeConfigParser()
 
@@ -15,9 +15,9 @@ def steamcmd_update(myappid, mysteamcmdpath, mypath, mylogin, mypassword):
 	steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=mysteamcmdpath, login=mylogin, password=mypassword, installdir=mypath, id=myappid)
 	return steamcmd_run
 
-def srcds_launch():
-	thing = "thing"
-	return thing
+def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip):
+	srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip}'.format()
+	return srcds_run
 
 if os.path.isfile(config_file):
 	#load configuration objects here
@@ -42,11 +42,11 @@ else:
 	if appid == '':
 		sys.exit("No appid given. Please supply an appid.")
 
-	path = raw_input("Gameserver Install Path (with trailing slash): [/home/steam/{}/".format(appid))
+	path = raw_input("Gameserver Install Path (with trailing slash): [/home/steam/{}/] ".format(appid))
 	if path == '':
 		path = '/home/steam/{}/'.format(appid)
 
-	gameserver_name = raw_input("Gameserver name IE: csgo: [{}]".format(appid))
+	gameserver_name = raw_input("Gameserver name IE: csgo: [{}] ".format(appid))
 	if gameserver_name == '':
 		gameserver_name = appid
 
@@ -93,6 +93,20 @@ else:
 
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
+# Check to see if the gameserver has an active screen
+s = Screen(gameserver_name)
+is_game_running = s.exists
+
+if is_game_running == True:
+	# The game is running.
+	print "The gameserver is currently running."
+	if str.lower(sys.argv[1]) == "stop":
+		print "Stop command sent"
+		# Kill the screen here.
+		exit()
+else:
+	print "Gameserver is not running"
+
 # Check if steamcmd is installed, if not, run it.
 INSTALL_DIR = os.path.dirname(path)
 if os.path.isfile(os.path.join(INSTALL_DIR, 'steamcmd.sh')):
@@ -113,6 +127,7 @@ print "All done installing/updating gameserver files. Launching the server."
 if gameserver_daemon == "srcds_run":
 	# Gameserver is srcds based. This part is easy.
 	exit()
+
 elif gameserver_daemon == "whatever_killing_floor_2_is":
 	# Gameserver is killing floor 2. Need to do up a custom command here.
 	exit()
