@@ -95,17 +95,36 @@ else:
 
 # Check to see if the gameserver has an active screen
 s = Screen(gameserver_name)
-is_game_running = s.exists
+is_server_running = s.exists
 
-if is_game_running == True:
+if is_server_running == True:
 	# The game is running.
-	print "The gameserver is currently running."
 	if str.lower(sys.argv[1]) == "stop":
 		print "Stop command sent"
 		# Kill the screen here.
+		s = Screen(gameserver_name)
+		s.kill()
+		print "Gameserver killed"
 		exit()
+
+	elif str.lower(sys.argv[1]) == "restart":
+		print "Restart command sent"
+		#Kill the screen here.
+		s = Screen(gameserver_name)
+		s.kill()
+		print "Gameserver killed"
+
+	elif str.lower(sys.argv[1]) == "update":
+		print "Stopping server for update"
+		# Kill the screen here.
+		s = Screen(gameserver_name)
+		s.kill()
+		print "Gameserver stopped. Moving on to update process."
+	else:
+		sys.exit("The gameserver is currently running. It is advised that you run this script with the stop command before proceeding.")
+
 else:
-	print "Gameserver is not running"
+	print "Gameserver is not running, proceeding to update and start."
 
 # Check if steamcmd is installed, if not, run it.
 INSTALL_DIR = os.path.dirname(path)
@@ -126,7 +145,11 @@ print "All done installing/updating gameserver files. Launching the server."
 
 if gameserver_daemon == "srcds_run":
 	# Gameserver is srcds based. This part is easy.
-	exit()
+	
+	# Create a new screen and launch the game.
+	s = Screen(gameserver_name, True)
+
+	# Launch the game here:
 
 elif gameserver_daemon == "whatever_killing_floor_2_is":
 	# Gameserver is killing floor 2. Need to do up a custom command here.
