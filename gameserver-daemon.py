@@ -15,8 +15,8 @@ def steamcmd_update(myappid, mysteamcmdpath, mypath, mylogin, mypassword):
     steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=mysteamcmdpath, login=mylogin, password=mypassword, installdir=mypath, id=myappid)
     return steamcmd_run
 
-def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip, mymap):
-    srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap)
+def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip, mymap, myrcon):
+    srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +rcon_password {rcon}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap, rcon=myrcon)
     return srcds_run
 
 if os.path.isfile(CONFIG_FILE):
@@ -35,7 +35,8 @@ if os.path.isfile(CONFIG_FILE):
         'tickrate': parser.get("gameserver", "tickrate"),
         'maxplayers': parser.get("gameserver", "maxplayers"),
         'runscript': parser.get("gameserver", "runscript"),
-        'map': parser.get("gameserver", "map")
+        'map': parser.get("gameserver", "map"),
+        'rcon': parser.get("gameserver", "rcon")
         }
 
     # Steamcmd dict for the steamcmd settings
@@ -181,6 +182,14 @@ else:
 
     parser.set('gameserver', 'map', gameserver['map'])
 
+    while True:
+        user_input = raw_input("Gameserver rcon/admin password: ")
+        if user_input:
+            gameserver['rcon'] = user_input
+            break
+        print "Please enter a rcon or admin password."
+
+    parser.set('gameserver', 'rcon', gameserver['rcon'])
 
     # Write the configuration file
     parser.write(open(CONFIG_FILE, 'w'))
@@ -252,11 +261,13 @@ print "All done installing/updating gameserver files. Launching the server."
 
 if gameserver['daemon'] == "srcds_run":
     # Gameserver is srcds based. Form up a start command
-    launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'])
+    launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
     srcds_run = '{path}/srcds_run {launch_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch)
     print srcds_run
+
     # Load up the screen
     s = Screen(gameserver['name'], True)
-    s.send_commands('bash')
+    #s.send_commands('bash')
     s.send_commands(srcds_run)
+
     print 'Server started. To monitor, attach {} screen'.format(gameserver['name'])
