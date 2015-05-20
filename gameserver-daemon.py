@@ -15,8 +15,8 @@ def steamcmd_update(myappid, mysteamcmdpath, mypath, mylogin, mypassword):
     steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=mysteamcmdpath, login=mylogin, password=mypassword, installdir=mypath, id=myappid)
     return steamcmd_run
 
-def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip):
-    srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip}'.format()
+def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip, mymap):
+    srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap)
     return srcds_run
 
 if os.path.isfile(CONFIG_FILE):
@@ -34,7 +34,8 @@ if os.path.isfile(CONFIG_FILE):
         'daemon': parser.get("gameserver", "daemon"),
         'tickrate': parser.get("gameserver", "tickrate"),
         'maxplayers': parser.get("gameserver", "maxplayers"),
-        'runscript': parser.get("gameserver", "runscript")
+        'runscript': parser.get("gameserver", "runscript"),
+        'map': parser.get("gameserver", "map")
         }
 
     # Steamcmd dict for the steamcmd settings
@@ -171,9 +172,28 @@ else:
 
     parser.set('gameserver', 'maxplayers', gameserver['maxplayers'])
 
+    while True:
+        user_input = raw_input("Gameserver starting map: ")
+        if user_input:
+            gameserver['map'] = user_input
+            break
+        print "No map specified. Please put a map here."
+
+    parser.set('gameserver', 'map', gameserver['map'])
+
+
     # Write the configuration file
     parser.write(open(CONFIG_FILE, 'w'))
     print "Configuration file saved as {}".format(CONFIG_FILE)
+
+    # Create the runscript file
+    if os.path.exists(os.path.join(gameserver['path'],gameserver['runscript'])) is False:
+        f = open(os.path.join(gameserver['path'],gameserver['runscript']), 'w')
+        f.write("login {steamlogin} {steampassword}\n".format(steamlogin=steamcmd['user'], steampassword=steamcmd['password']))
+        f.write("force_install_dir {}\n".format(os.path.join(gameserver['path'], gameserver['name'])))
+        f.write("app_update {} validate\n".format(gameserver['appid']))
+        f.write("quit\n")
+        f.close()
 
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
@@ -227,16 +247,16 @@ else:
 
 print "All done installing/updating gameserver files. Launching the server."
 
-#if gameserver_daemon == "srcds_run":
-#    # Gameserver is srcds based. This part is easy.
-#    # def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip):
-#    launch_command = srcds_launch(gameserver_name, path, "runscript.txt",)
-#    # Create a new screen and launch the game.
-#    s = Screen(gameserver_name, True)
-#    s.send_commands("")
-#
-#    # Launch the game here:
-#
-#elif gameserver_daemon == "whatever_killing_floor_2_is":
-#    # Gameserver is killing floor 2. Need to do up a custom command here.
-#    exit()
+
+# LAUNCH THE SERVER! \m/
+
+if gameserver['daemon'] == "srcds_run":
+    # Gameserver is srcds based. Form up a start command
+    launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'])
+    srcds_run = '{path}/srcds_run {launch_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch)
+    print srcds_run
+    # Load up the screen
+    s = Screen(gameserver['name'], True)
+    s.send_commands('bash')
+    s.send_commands(srcds_run)
+    print 'Server started. To monitor, attach {} screen'.format(gameserver['name'])
