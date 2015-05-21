@@ -441,24 +441,6 @@ else:
     parser.write(open(CONFIG_FILE, 'w'))
     print "Configuration file saved as {}".format(CONFIG_FILE)
 
-    # Create the runscript file
-    with open(os.path.join('templates', 'runscript.txt'), "r") as file:
-        x = file.read()
-
-        template = Template(x)
-
-        runscript_vars = {
-                        'steamlogin': steamcmd['user'],
-                        'steampassword': steamcmd['password'],
-                        'install_dir': os.path.join(gameserver['path'], gameserver['name']),
-                        'appid': gameserver['appid']
-        }
-
-        output = template.render(runscript_vars)
-
-        with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
-            outfile.write(output)
-
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
 # Check to see if the gameserver has an active screen
@@ -514,6 +496,24 @@ print "All done installing/updating gameserver files. Launching the server."
 # -------------------------------
 # Build server configurations
 # -------------------------------
+
+# Runscript configuration
+with open(os.path.join('templates', 'runscript.txt'), "r") as file:
+    x = file.read()
+
+    template = Template(x)
+
+    runscript_vars = {
+                    'steamlogin': steamcmd['user'],
+                    'steampassword': steamcmd['password'],
+                    'install_dir': os.path.join(gameserver['path'], gameserver['name']),
+                    'appid': gameserver['appid']
+    }
+
+    output = template.render(runscript_vars)
+
+    with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
+        outfile.write(output)
 
 # Configuration settings
 
