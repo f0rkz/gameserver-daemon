@@ -494,6 +494,23 @@ if is_server_running == True:
 else:
     print "Gameserver is not running, proceeding to update and start."
 
+# Check if steamcmd is installed, if not, run it.
+INSTALL_DIR = os.path.dirname(gameserver['path'])
+if os.path.isfile(os.path.join(INSTALL_DIR, 'steamcmd.sh')):
+    #Steamcmd is installed in the install path
+    print "steamcmd is installed. Updating gameserver files. This may take a while..."
+    subprocess.call(steamcmd_update(gameserver['appid'], gameserver['path'], os.path.join(gameserver['path'], gameserver['name']), steamcmd['user'], steamcmd['password']), shell=True)
+
+else:
+    #Download steamcmd and extract it
+    urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(gameserver['path'], 'steamcmd_linux.tar.gz'))
+    steamcmd_tar = tarfile.open(os.path.join(gameserver['path'], 'steamcmd_linux.tar.gz'), 'r:gz')
+    steamcmd_tar.extractall(gameserver['path'])
+    print "Steamcmd installed. Starting first run. Downloading gamefiles. This may take a while..."
+    subprocess.call(steamcmd_update(gameserver['appid'], gameserver['path'], os.path.join(gameserver['path'], gameserver['name']), steamcmd['user'], steamcmd['password']), shell=True)
+
+print "All done installing/updating gameserver files. Launching the server."
+
 # -------------------------------
 # Build server configurations
 # -------------------------------
@@ -563,23 +580,6 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
     
     with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','server.cfg'), "wb") as outfile:
         outfile.write(output)
-
-# Check if steamcmd is installed, if not, run it.
-INSTALL_DIR = os.path.dirname(gameserver['path'])
-if os.path.isfile(os.path.join(INSTALL_DIR, 'steamcmd.sh')):
-    #Steamcmd is installed in the install path
-    print "steamcmd is installed. Updating gameserver files. This may take a while..."
-    subprocess.call(steamcmd_update(gameserver['appid'], gameserver['path'], os.path.join(gameserver['path'], gameserver['name']), steamcmd['user'], steamcmd['password']), shell=True)
-
-else:
-    #Download steamcmd and extract it
-    urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(gameserver['path'], 'steamcmd_linux.tar.gz'))
-    steamcmd_tar = tarfile.open(os.path.join(gameserver['path'], 'steamcmd_linux.tar.gz'), 'r:gz')
-    steamcmd_tar.extractall(gameserver['path'])
-    print "Steamcmd installed. Starting first run. Downloading gamefiles. This may take a while..."
-    subprocess.call(steamcmd_update(gameserver['appid'], gameserver['path'], os.path.join(gameserver['path'], gameserver['name']), steamcmd['user'], steamcmd['password']), shell=True)
-
-print "All done installing/updating gameserver files. Launching the server."
 
 # LAUNCH THE SERVER! \m/
 
