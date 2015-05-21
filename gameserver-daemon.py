@@ -211,13 +211,16 @@ else:
 
         output = template.render(runscript_vars)
 
-    if os.path.exists(os.path.join(gameserver['path'],gameserver['runscript'])) is False:
-        f = open(os.path.join(gameserver['path'],gameserver['runscript']), 'w')
-        f.write("login {steamlogin} {steampassword}\n".format(steamlogin=steamcmd['user'], steampassword=steamcmd['password']))
-        f.write("force_install_dir {}\n".format(os.path.join(gameserver['path'], gameserver['name'])))
-        f.write("app_update {} validate\n".format(gameserver['appid']))
-        f.write("quit\n")
-        f.close()
+        with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
+            outfile.write(output)
+
+#    if os.path.exists(os.path.join(gameserver['path'],gameserver['runscript'])) is False:
+#        f = open(os.path.join(gameserver['path'],gameserver['runscript']), 'w')
+#        f.write("login {steamlogin} {steampassword}\n".format(steamlogin=steamcmd['user'], steampassword=steamcmd['password']))
+#        f.write("force_install_dir {}\n".format(os.path.join(gameserver['path'], gameserver['name'])))
+#        f.write("app_update {} validate\n".format(gameserver['appid']))
+#        f.write("quit\n")
+#        f.close()
 
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
