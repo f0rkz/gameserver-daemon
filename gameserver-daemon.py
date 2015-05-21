@@ -212,7 +212,7 @@ is_server_running = s.exists
 
 if is_server_running == True:
     # The game is running.
-    if str.lower(sys.argv[1]) == "stop":
+    if len(sys.argv) and str.lower(sys.argv[1]) == "stop":
         print "Stop command sent"
         # Kill the screen here.
         s = Screen(gameserver['name'])
@@ -220,14 +220,14 @@ if is_server_running == True:
         print "Gameserver killed"
         exit()
 
-    elif str.lower(sys.argv[1]) == "restart":
+    elif len(sys.argv) and str.lower(sys.argv[1]) == "restart":
         print "Restart command sent"
         #Kill the screen here.
         s = Screen(gameserver['name'])
         s.kill()
         print "Gameserver killed"
 
-    elif str.lower(sys.argv[1]) == "update":
+    elif len(sys.argv) and str.lower(sys.argv[1]) == "update":
         print "Stopping server for update"
         # Kill the screen here.
         s = Screen(gameserver['name'])
