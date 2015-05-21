@@ -4,6 +4,7 @@ import ConfigParser
 import tarfile
 import urllib
 import subprocess
+from jinja2 import Template
 from screenutils import list_screens, Screen
 
 parser = ConfigParser.SafeConfigParser()
@@ -196,6 +197,20 @@ else:
     print "Configuration file saved as {}".format(CONFIG_FILE)
 
     # Create the runscript file
+    with open(os.path.join('templates', 'runscript.txt'), "r") as file:
+        x = file.read()
+
+        template = Template(x)
+
+        runscript_vars = {
+                        'steamlogin': steamcmd['user'],
+                        'steampassword': steacmd['password'],
+                        'install_dir': os.path.join(gameserver['path'], gameserver['name']),
+                        'appid': gameserver['appid']
+        }
+
+        output = template.render(runscript_vars)
+
     if os.path.exists(os.path.join(gameserver['path'],gameserver['runscript'])) is False:
         f = open(os.path.join(gameserver['path'],gameserver['runscript']), 'w')
         f.write("login {steamlogin} {steampassword}\n".format(steamlogin=steamcmd['user'], steampassword=steamcmd['password']))
