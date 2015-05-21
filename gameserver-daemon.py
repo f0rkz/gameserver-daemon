@@ -37,14 +37,29 @@ if os.path.isfile(CONFIG_FILE):
         'maxplayers': parser.get("gameserver", "maxplayers"),
         'runscript': parser.get("gameserver", "runscript"),
         'map': parser.get("gameserver", "map"),
-        'rcon': parser.get("gameserver", "rcon")
+        'rcon': parser.get("gameserver", "rcon"),
+        'region': parser.get("gameserver", "region"),
+        'steamgroup': parser.get("gameserver", "steamgroup"),
+        'lan': parser.get("gameserver", "lan"),
+        'alltalk': parser.get("gameserver", "alltalk"),
+        'voiceenable': parser.get("gameserver", "voiceenable"),
+        'pure': parser.get("gameserver", "pure"),
+        'consistency': parser.get("gameserver", "consistency"),
         }
+
+    # Logic for false variables
+    if gameserver['steamgroup'] == "False":
+        gameserver['steamgroup'] = False
+    if gameserver['lan'] == "False":
+        gameserver['lan'] = False
 
     # Steamcmd dict for the steamcmd settings
     steamcmd = {
         'user': parser.get("steamcmd", "user"),
         'password': parser.get("steamcmd", "password")
     }
+
+    csgo = {}
 
 else:
     #Prompt for configuration information
@@ -192,6 +207,236 @@ else:
 
     parser.set('gameserver', 'rcon', gameserver['rcon'])
 
+    while True:
+        user_input = raw_input("Server region: [0] ")
+        if user_input:
+            gameserver['region'] = user_input
+            break
+        gameserver['region'] = '0'
+        break
+
+    parser.set('gameserver', 'region', gameserver['region'])
+
+    while True:
+        user_input = raw_input("Steamgroup ID: [null] ")
+        if user_input:
+            gameserver['steamgroup'] = user_input
+            break
+        gameserver['steamgroup'] = "False"
+        break
+
+    parser.set('gameserver', 'steamgroup', gameserver['steamgroup'])
+
+    while True:
+        user_input = raw_input("LAN Server (sv_lan): [null] ")
+        if user_input:
+            gameserver['lan'] = user_input
+            break
+        gameserver['lan'] = "False"
+        break
+
+    parser.set('gameserver', 'lan', gameserver['lan'])
+
+    while True:
+        user_input = raw_input("sv_alltalk: [0] ")
+        if user_input:
+            gameserver['alltalk'] = user_input
+            break
+        gameserver['alltalk'] = "0"
+        break
+
+    parser.set('gameserver', 'alltalk', gameserver['alltalk'])
+
+    while True:
+        user_input = raw_input("sv_voiceenable: [1] ")
+        if user_input:
+            gameserver['voiceenable'] = user_input
+            break
+        gameserver['voiceenable'] = "1"
+        break
+
+    parser.set('gameserver', 'voiceenable', gameserver['voiceenable'])
+
+    while True:
+        user_input = raw_input("sv_pure: [1] ")
+        if user_input:
+            gameserver['pure'] = user_input
+            break
+        gameserver['pure'] = "1"
+        break
+
+    parser.set('gameserver', 'pure', gameserver['pure'])
+
+    while True:
+        user_input = raw_input("sv_consistency: [0] ")
+        if user_input:
+            gameserver['consistency'] = user_input
+            break
+        gameserver['consistency'] = "0"
+        break
+
+    parser.set('gameserver', 'consistency', gameserver['consistency'])
+
+    # CSGO Specific options
+
+    if gameserver['name'] == 'csgo':
+        #stuff for csgo things here
+        print "Gameserver configuration options for CSGO"
+        csgo = {}
+        parser.add_section('csgo')
+
+        while True:
+            print "Configuration types: esl | custom"
+            user_input = raw_input("Please select a configuration type: ")
+            if user_input == "esl" or user_input == "custom":
+                csgo['template'] = user_input
+                break
+            print "Please type an option"
+
+        parser.set('csgo', 'template', csgo['template'])
+
+        if csgo['template'] == "custom":
+
+            while True:
+                user_input = raw_input("sv_deadtalk: [0]")
+                if user_input:
+                    csgo['deadtalk'] = user_input
+                    break
+                gameserver['deadtalk'] = "0"
+                break
+
+            parser.set('csgo', 'deadtalk', csgo['deadtalk'])
+
+            while True:
+                user_input = raw_input("sv_full_alltalk: [0] ")
+                if user_input:
+                    csgo['full_alltalk'] = user_input
+                    break
+                csgo['full_alltalk'] = "0"
+                break
+
+            parser.set('csgo', 'full_alltalk', csgo['full_alltalk'])
+
+            while True:
+                user_input = raw_input("sv_pausable: [0] ")
+                if user_input:
+                    csgo['pausable'] = user_input
+                    break
+                csgo['pausable'] = "0"
+                break
+
+            parser.set('csgo', 'pausable', csgo['pausable'])
+
+            while True:
+                user_input = raw_input("mp_limitteams: [1] ")
+                if user_input:
+                    csgo['limitteams'] = user_input
+                    break
+                csgo['limitteams'] = "1"
+                break
+
+            parser.set('csgo', 'limitteams', csgo['limitteams'])
+
+            while True:
+                user_input = raw_input("mp_friendlyfire: [0] ")
+                if user_input:
+                    csgo['friendlyfire'] = user_input
+                    break
+                csgo['friendlyfire'] = "0"
+                break
+
+            parser.set('csgo', 'friendlyfire', csgo['firendlyfire'])
+
+            while True:
+                user_input = raw_input("mp_autoteambalance: [1] ")
+                if user_input:
+                    csgo['teambalance'] = user_input
+                    break
+                csgo['teambalance'] = "1"
+                break
+
+            parser.set('csgo', 'teambalance', csgo['teambalance'])
+
+            while True:
+                user_input = raw_input("mp_autokick: [1] ")
+                if user_input:
+                    csgo['autokick'] = user_input
+                    break
+                csgo['autokick'] = "1"
+                break
+
+            parser.set('csgo', 'autokick', csgo['autokick'])
+
+            while True:
+                user_input = raw_input("mp_tkpunish: [1] ")
+                if user_input:
+                    csgo['tkpunish'] = user_input
+                    break
+                csgo['tkpunish'] = "1"
+                break
+
+            parser.set('csgo', 'tkpunish', csgo['tkpunish'])
+
+            while True:
+                user_input = raw_input("mp_freezetime: [6] ")
+                if user_input:
+                    csgo['freezetime'] = user_input
+                    break
+                csgo['freezetime'] = "6"
+                break
+
+            parser.set('csgo', 'freezetime', csgo['freezetime'])
+
+            while True:
+                user_input = raw_input("mp_maxrounds: [0] ")
+                if user_input:
+                    csgo['maxrounds'] = user_input
+                    break
+                csgo['maxrounds'] = "0"
+                break
+
+            parser.set('csgo', 'maxrounds', csgo['maxrounds'])
+
+            while True:
+                user_input = raw_input("mp_roundtime: [5] ")
+                if user_input:
+                    csgo['roundtime'] = user_input
+                    break
+                csgo['roundtime'] = "5"
+                break
+
+            parser.set('csgo', 'roundtime', csgo['roundtime'])
+
+            while True:
+                user_input = raw_input("mp_timelimit: [5] ")
+                if user_input:
+                    csgo['timelimit'] = user_input
+                    break
+                csgo['timelimit'] = "5"
+                break
+
+            parser.set('csgo', 'timelimit', csgo['timelimit'])
+
+            while True:
+                user_input = raw_input("mp_buytime: [90] ")
+                if user_input:
+                    csgo['buytime'] = user_input
+                    break
+                csgo['buytime'] = "90"
+                break
+
+            parser.set('csgo', 'buytime', csgo['buytime'])
+
+            while True:
+                user_input = raw_input("mp_do_warmup_period: [1] ")
+                if user_input:
+                    csgo['warmup_period'] = user_input
+                    break
+                csgo['warmup_period'] = "1"
+                break
+
+            parser.set('csgo', 'warmup_period', csgo['warmup_period'])
+
     # Write the configuration file
     parser.write(open(CONFIG_FILE, 'w'))
     print "Configuration file saved as {}".format(CONFIG_FILE)
@@ -204,7 +449,7 @@ else:
 
         runscript_vars = {
                         'steamlogin': steamcmd['user'],
-                        'steampassword': steacmd['password'],
+                        'steampassword': steamcmd['password'],
                         'install_dir': os.path.join(gameserver['path'], gameserver['name']),
                         'appid': gameserver['appid']
         }
@@ -213,14 +458,6 @@ else:
 
         with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
             outfile.write(output)
-
-#    if os.path.exists(os.path.join(gameserver['path'],gameserver['runscript'])) is False:
-#        f = open(os.path.join(gameserver['path'],gameserver['runscript']), 'w')
-#        f.write("login {steamlogin} {steampassword}\n".format(steamlogin=steamcmd['user'], steampassword=steamcmd['password']))
-#        f.write("force_install_dir {}\n".format(os.path.join(gameserver['path'], gameserver['name'])))
-#        f.write("app_update {} validate\n".format(gameserver['appid']))
-#        f.write("quit\n")
-#        f.close()
 
 # Now that our configuration is out of the way, let's move on to installing and updating gameserver files
 
@@ -256,6 +493,76 @@ if is_server_running == True:
 
 else:
     print "Gameserver is not running, proceeding to update and start."
+
+# -------------------------------
+# Build server configurations
+# -------------------------------
+
+# Configuration settings
+
+with open(os.path.join('templates', 'server.cfg'), "r") as file:
+    x = file.read()
+
+    template = Template(x)
+
+    srcds_vars = {
+                'hostname': gameserver['hostname'],
+                'rcon': gameserver['rcon'],
+                'game': gameserver['name'],
+                'region': gameserver['region'],
+                'lan': gameserver['lan'],
+                'alltalk': gameserver['alltalk'],
+                'voiceenable': gameserver['voiceenable'],
+                'pure': gameserver['pure'],
+                'consistency': gameserver['consistency'],
+    }
+
+    if gameserver['name'] == 'csgo':
+        csgo['template'] = parser.get("csgo", "template")
+
+        if csgo['template'] == 'esl':
+            srcds_vars['csgo_template'] = csgo['template']
+
+        else:
+            csgo = {
+                'deadtalk': parser.get("csgo", "deadtalk"),
+                'full_alltalk': parser.get("csgo", "full_alltalk"),
+                'pausable': parser.get("csgo", "pausable"),
+                'limitteams': parser.get("csgo", "limitteams"),
+                'friendlyfire': parser.get("csgo", "friendlyfire"),
+                'teambalance': parser.get("csgo", "teambalance"),
+                'autokick': parser.get("csgo", "autokick"),
+                'tkpunish': parser.get("csgo", "tkpunish"),
+                'freezetime': parser.get("csgo", "freezetime"),
+                'maxrounds': parser.get("csgo", "maxrounds"),
+                'roundtime': parser.get("csgo", "roundtime"),
+                'timelimit': parser.get("csgo", "timelimit"),
+                'buytime': parser.get("csgo", "buytime"),
+                'warmup_period': parser.get("csgo", "warmup_period"),
+            }
+
+            srcds_vars.update({
+                        'csgo_template': csgo['template'],
+                        'deadtalk': csgo['deadtalk'],
+                        'full_alltalk': csgo['full_alltalk'],
+                        'pausable': csgo['pausable'],
+                        'limitteams': csgo['limitteams'],
+                        'friendlyfire': csgo['friendlyfire'],
+                        'teambalance': csgo['teambalance'],
+                        'autokick': csgo['autokick'],
+                        'tkpunish': csgo['tkpunish'],
+                        'freezetime': csgo['freezetime'],
+                        'maxrounds': csgo['maxrounds'],
+                        'roundtime': csgo['roundtime'],
+                        'timelimit': csgo['timelimit'],
+                        'buytime': csgo['buytime'],
+                        'warmup_period': csgo['warmup_period'],
+            })
+
+    output = template.render(srcds_vars)
+    
+    with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','server.cfg'), "wb") as outfile:
+        outfile.write(output)
 
 # Check if steamcmd is installed, if not, run it.
 INSTALL_DIR = os.path.dirname(gameserver['path'])
