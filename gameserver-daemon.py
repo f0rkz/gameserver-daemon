@@ -212,27 +212,29 @@ is_server_running = s.exists
 
 if is_server_running == True:
     # The game is running.
-    if len(sys.argv) and str.lower(sys.argv[1]) == "stop":
-        print "Stop command sent"
-        # Kill the screen here.
-        s = Screen(gameserver['name'])
-        s.kill()
-        print "Gameserver killed"
-        exit()
+    if len(sys.argv):
 
-    elif len(sys.argv) and str.lower(sys.argv[1]) == "restart":
-        print "Restart command sent"
-        #Kill the screen here.
-        s = Screen(gameserver['name'])
-        s.kill()
-        print "Gameserver killed"
+        if str.lower(sys.argv[1]) == "stop":
+            print "Stop command sent"
+            # Kill the screen here.
+            s = Screen(gameserver['name'])
+            s.kill()
+            print "Gameserver killed"
+            exit()
+            
+        elif str.lower(sys.argv[1]) == "restart":
+            print "Restart command sent"
+            #Kill the screen here.
+            s = Screen(gameserver['name'])
+            s.kill()
+            print "Gameserver killed"
 
-    elif len(sys.argv) and str.lower(sys.argv[1]) == "update":
-        print "Stopping server for update"
-        # Kill the screen here.
-        s = Screen(gameserver['name'])
-        s.kill()
-        print "Gameserver stopped. Moving on to update process."
+        elif str.lower(sys.argv[1]) == "update":
+            print "Stopping server for update"
+            # Kill the screen here.
+            s = Screen(gameserver['name'])
+            s.kill()
+            print "Gameserver stopped. Moving on to update process."
     else:
         sys.exit("The gameserver is currently running. It is required that you run this script with the stop command before proceeding.")
 
@@ -255,7 +257,6 @@ else:
     subprocess.call(steamcmd_update(gameserver['appid'], gameserver['path'], os.path.join(gameserver['path'], gameserver['name']), steamcmd['user'], steamcmd['password']), shell=True)
 
 print "All done installing/updating gameserver files. Launching the server."
-
 
 # LAUNCH THE SERVER! \m/
 
