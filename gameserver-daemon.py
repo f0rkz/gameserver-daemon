@@ -354,7 +354,7 @@ else:
                 csgo['friendlyfire'] = "0"
                 break
 
-            parser.set('csgo', 'friendlyfire', csgo['firendlyfire'])
+            parser.set('csgo', 'friendlyfire', csgo['friendlyfire'])
 
             while True:
                 user_input = raw_input("mp_autoteambalance: [1] ")
