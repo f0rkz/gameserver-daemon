@@ -45,6 +45,7 @@ if os.path.isfile(CONFIG_FILE):
         'voiceenable': parser.get("gameserver", "voiceenable"),
         'pure': parser.get("gameserver", "pure"),
         'consistency': parser.get("gameserver", "consistency"),
+        'extra_parameters': parser.get("gameserver", "extra_parameters"),
         }
 
     # Logic for false variables
@@ -499,6 +500,11 @@ else:
     # ------------------------------
     # Team Fortress 2 config options
     # ------------------------------
+
+    # Extra_parameters is special. This is a hacky way of doing it, but let's do it.
+    if not gameserver['name'] == 'tf':
+        gameserver['extra_parameters'] = ""
+        parser.set('gameserver', 'extra_parameters', gameserver['extra_parameters'])
     
     if gameserver['name'] == 'tf':
         # Set Team Fortress 2 configs here
@@ -506,16 +512,30 @@ else:
         parser.add_section('tf')
 
         #Start while statements here...
-
         while True:
-            user_input = raw_input("mp_timelimit: [40] ")
+            user_input = raw_input("Mann Versus Machine: [0] ")
             if user_input:
-                tf['timelimit'] = user_input
+                gameserver['extra_parameters'] = "+tf_mm_servermode 2"
+                mvm_enable = True
                 break
-            tf['timelimit'] = "40"
+            gameserver['extra_parameters'] = ""
+            mvm_enable = False
             break
 
-        parser.set('tf', 'timelimit', tf['timelimit'])
+        parser.set('gameserver', 'extra_parameters', gameserver['extra_parameters'])
+
+        if mvm_enable is False:
+            while True:
+                user_input = raw_input("mp_timelimit: [40] ")
+                if user_input:
+                    tf['timelimit'] = user_input
+                    break
+                tf['timelimit'] = "40"
+                break
+
+            parser.set('tf', 'timelimit', tf['timelimit'])
+
+
 
     # ------------------------------
     # Half-Life Deathmatch options
@@ -726,12 +746,13 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
             })
 
     if gameserver['name'] == 'tf':
-        tf = {
-            'timelimit': parser.get("tf", "timelimit"),
-        }
+        if gameserver['extra_parameters'] == "":
+            tf = {
+                'timelimit': parser.get("tf", "timelimit"),
+            }
 
-        srcds_vars.update({
-            'timelimit': tf['timelimit'],
+            srcds_vars.update({
+                'timelimit': tf['timelimit'],
             })
 
     if gameserver['name'] == 'hl2mp':
@@ -759,7 +780,7 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
 if gameserver['daemon'] == "srcds_run":
     # Gameserver is srcds based. Form up a start command
     launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
-    srcds_run = '{path}/srcds_run {launch_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch)
+    srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
     print srcds_run
 
     # Load up the screen
