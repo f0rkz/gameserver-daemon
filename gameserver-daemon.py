@@ -62,7 +62,7 @@ if os.path.isfile(CONFIG_FILE):
     csgo = {}
     bms = {}
     tf = {}
-    hl2dm = {}
+    hl2mp = {}
 
 else:
     #Prompt for configuration information
@@ -74,6 +74,10 @@ else:
 
     parser.add_section('gameserver')
     parser.add_section('steamcmd')
+
+    # -----------------------------------------
+    # Base configuration options here.
+    # -----------------------------------------
 
     while True:
         user_input = raw_input("Steam AppID: ")
@@ -95,7 +99,7 @@ else:
 
     while True:
         user_input = raw_input("Gameserver name IE: csgo: ")
-        if user_input and user_input.isalpha():
+        if user_input:
             gameserver['name'] = user_input
             break
         print "No input or invalid input given. Please try again."
@@ -280,7 +284,9 @@ else:
 
     parser.set('gameserver', 'consistency', gameserver['consistency'])
 
+    # ----------------------
     # CSGO Specific options
+    # ----------------------
 
     if gameserver['name'] == 'csgo':
         #stuff for csgo things here
@@ -440,26 +446,120 @@ else:
 
             parser.set('csgo', 'warmup_period', csgo['warmup_period'])
 
+    # ------------------------------
+    # Black Mesa config options
+    # ------------------------------
+
     if gameserver['name'] == 'bms':
         # Set black mesa source configs here.
         bms = {}
         parser.add_section('bms')
 
         #Start while statements here...
+        while True:
+            user_input = raw_input("mp_teamplay: [0] ")
+            if user_input:
+                bms['teamplay'] = user_input
+                break
+            bms['teamplay'] = "0"
+            break
 
+        parser.set('bms', 'teamplay', bms['teamplay'])
+
+        while True:
+            user_input = raw_input("mp_timelimit: [900] ")
+            if user_input:
+                bms['timelimit'] = user_input
+                break
+            bms['timelimit'] = "900"
+            break
+
+        parser.set('bms', 'timelimit', bms['timelimit'])
+
+        while True:
+            user_input = raw_input("mp_warmup_time: [30] ")
+            if user_input:
+                bms['warmup_time'] = user_input
+                break
+            bms['warmup_time'] = "30"
+            break
+
+        parser.set('bms', 'warmup_time', bms['warmup_time'])
+
+        while True:
+            user_input = raw_input("mp_fraglimit: [50] ")
+            if user_input:
+                bms['fraglimit'] = user_input
+                break
+            bms['fraglimit'] = "50"
+            break
+
+        parser.set('bms', 'fraglimit', bms['fraglimit'])
+    
+    # ------------------------------
+    # Team Fortress 2 config options
+    # ------------------------------
+    
     if gameserver['name'] == 'tf':
         # Set Team Fortress 2 configs here
         tf = {}
-        parser.add_section['tf']
+        parser.add_section('tf')
 
         #Start while statements here...
 
-    if gameserver['name'] == 'hl2dm':
-        # Set HL2DM configs here.
-        hl2dm = {}
-        parser.add_section['hl2dm']
+        while True:
+            user_input = raw_input("mp_timelimit: [40] ")
+            if user_input:
+                tf['timelimit'] = user_input
+                break
+            tf['timelimit'] = "40"
+            break
+
+        parser.set('tf', 'timelimit', tf['timelimit'])
+
+    # ------------------------------
+    # Half-Life Deathmatch options
+    # ------------------------------
+
+    if gameserver['name'] == 'hl2mp':
+        # Set HL2MP configs here.
+        hl2mp = {}
+        parser.add_section('hl2mp')
 
         #Start while statements here...
+
+        #mp_fraglimit 100
+        #mp_timelimit 20
+        #mp_teamplay 0
+        while True:
+            user_input = raw_input("mp_fraglimit: [50] ")
+            if user_input:
+                hl2mp['fraglimit'] = user_input
+                break
+            hl2mp['fraglimit'] = "50"
+            break
+
+        parser.set('hl2mp', 'fraglimit', hl2mp['fraglimit'])
+
+        while True:
+            user_input = raw_input("mp_timelimit: [30] ")
+            if user_input:
+                hl2mp['timelimit'] = user_input
+                break
+            hl2mp['timelimit'] = "30"
+            break
+
+        parser.set('hl2mp', 'timelimit', hl2mp['fraglimit'])
+
+        while True:
+            user_input = raw_input("mp_teamplay: [0] ")
+            if user_input:
+                hl2mp['teamplay'] = user_input
+                break
+            hl2mp['teamplay'] = "0"
+            break
+
+        parser.set('hl2mp', 'teamplay', hl2mp['teamplay'])
 
     # Add any other gametypes you can think of and any special convars they need.
 
@@ -553,6 +653,8 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
 
     template = Template(x)
 
+    # These are the basic configuration options shared between servers.
+
     srcds_vars = {
                 'hostname': gameserver['hostname'],
                 'rcon': gameserver['rcon'],
@@ -609,13 +711,41 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
 
     if gameserver['name'] == 'bms':
         # Like CSGO above, build game-specific convars here.
-        exit()
+        bms = {
+            'teamplay': parser.get("bms", "teamplay"),
+            'timelimit': parser.get("bms", "timelimit"),
+            'warmup_time': parser.get("bms", "warmup_time"),
+            'fraglimit': parser.get("bms", "fraglimit"),
+        }
+
+        srcds_vars.update({
+            'teamplay': bms['teamplay'],
+            'timelimit': bms['timelimit'],
+            'warmup_time': bms['warmup_time'],
+            'fraglimit': bms['fraglimit'],
+            })
 
     if gameserver['name'] == 'tf':
-        exit()
+        tf = {
+            'timelimit': parser.get("tf", "timelimit"),
+        }
 
-    if gameserver['name'] == 'hl2dm':
-        exit()
+        srcds_vars.update({
+            'timelimit': tf['timelimit'],
+            })
+
+    if gameserver['name'] == 'hl2mp':
+        hl2mp = {
+                'teamplay': parser.get("hl2mp", "teamplay"),
+                'fraglimit': parser.get("hl2mp", "fraglimit"),
+                'timelimit': parser.get("hl2mp", "timelimit"),
+        }
+
+        srcds_vars.update({
+            'teamplay': hl2mp['teamplay'],
+            'fraglimit': hl2mp['fraglimit'],
+            'timelimit': hl2mp['timelimit'],
+            })
 
     # Output file.
     output = template.render(srcds_vars)
