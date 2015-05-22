@@ -60,6 +60,9 @@ if os.path.isfile(CONFIG_FILE):
     }
 
     csgo = {}
+    bms = {}
+    tf = {}
+    hl2dm = {}
 
 else:
     #Prompt for configuration information
@@ -437,6 +440,34 @@ else:
 
             parser.set('csgo', 'warmup_period', csgo['warmup_period'])
 
+    if gameserver['name'] == 'bms':
+        # Set black mesa source configs here.
+        bms = {}
+        parser.add_section('bms')
+
+        #Start while statements here...
+
+    if gameserver['name'] == 'tf':
+        # Set Team Fortress 2 configs here
+        tf = {}
+        parser.add_section['tf']
+
+        #Start while statements here...
+
+    if gameserver['name'] == 'hl2dm':
+        # Set HL2DM configs here.
+        hl2dm = {}
+        parser.add_section['hl2dm']
+
+        #Start while statements here...
+
+    # Add any other gametypes you can think of and any special convars they need.
+
+
+
+
+    # End Gametypes and write configuration
+
     # Write the configuration file
     parser.write(open(CONFIG_FILE, 'w'))
     print "Configuration file saved as {}".format(CONFIG_FILE)
@@ -576,9 +607,21 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                         'warmup_period': csgo['warmup_period'],
             })
 
+    if gameserver['name'] == 'bms':
+        # Like CSGO above, build game-specific convars here.
+        exit()
+
+    if gameserver['name'] == 'tf':
+        exit()
+
+    if gameserver['name'] == 'hl2dm':
+        exit()
+
+    # Output file.
     output = template.render(srcds_vars)
     
     with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','server.cfg'), "wb") as outfile:
+        # Write the config.
         outfile.write(output)
 
 # LAUNCH THE SERVER! \m/
@@ -594,4 +637,4 @@ if gameserver['daemon'] == "srcds_run":
     #s.send_commands('bash')
     s.send_commands(srcds_run)
 
-    print 'Server started. To monitor, attach {} screen'.format(gameserver['name'])
+    print 'Server started. To monitor, attach "{}" screen'.format(gameserver['name'])
