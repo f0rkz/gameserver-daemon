@@ -695,6 +695,7 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
 
         else:
             csgo = {
+                'template': parser.get("csgo", "template"),
                 'deadtalk': parser.get("csgo", "deadtalk"),
                 'full_alltalk': parser.get("csgo", "full_alltalk"),
                 'pausable': parser.get("csgo", "pausable"),
