@@ -17,7 +17,10 @@ def steamcmd_update(myappid, mysteamcmdpath, mypath, mylogin, mypassword):
     return steamcmd_run
 
 def srcds_launch(mygame, mysteamcmdpath, myrunscript, mymaxplayers, mytickrate, myport, myip, mymap, myrcon):
-    srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +rcon_password {rcon}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap, rcon=myrcon)
+    if mygame == 'csgo':
+        srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +rcon_password {rcon}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap, rcon=myrcon)
+    else:
+        srcds_run = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +rcon_password {rcon}'.format(game=mygame, steam_dir=mysteamcmdpath, runscript=myrunscript, maxplayers=mymaxplayers, tickrate=mytickrate, port=myport, ip=myip, map=mymap, rcon=myrcon)
     return srcds_run
 
 if os.path.isfile(CONFIG_FILE):
@@ -236,11 +239,11 @@ else:
     parser.set('gameserver', 'steamgroup', gameserver['steamgroup'])
 
     while True:
-        user_input = raw_input("LAN Server (sv_lan): [null] ")
+        user_input = raw_input("LAN Server (sv_lan): [0] ")
         if user_input:
             gameserver['lan'] = user_input
             break
-        gameserver['lan'] = "False"
+        gameserver['lan'] = "0"
         break
 
     parser.set('gameserver', 'lan', gameserver['lan'])
@@ -308,11 +311,29 @@ else:
         if csgo['template'] == "custom":
 
             while True:
+                user_input = raw_input("Gamemode: casual , competitive , armsrace , demolition , deathmatch , none : ")
+                if user_input == 'casual' or user_input == 'competitive' or user_input == 'armsrace' or user_input == 'demolition' or user_input == 'deathmatch' or user_input == 'none':
+                    csgo['gamemode'] = user_input
+                    break
+                print "Please select a gametype: casual, competitive , armsrace , demolition , deathmatch , none"
+
+            parser.set('csgo', 'gamemode', csgo['gamemode'])
+
+            while True:
+                user_input = raw_input("Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none ")
+                if user_input == 'mg_op_op06' or user_input == 'mg_op_op05' or user_input == 'mg_op_breakout' or user_input == 'mg_active' or user_input == 'mg_reserves' or user_input == 'mg_armsrace' or user_input == 'mg_demolition' or user_input == 'none':
+                    csgo['mapgroup'] = user_input
+                    break
+                print "Please select a mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none : "
+
+            parser.set('csgo', 'mapgroup', csgo['mapgroup'])
+
+            while True:
                 user_input = raw_input("sv_deadtalk: [0]")
                 if user_input:
                     csgo['deadtalk'] = user_input
                     break
-                gameserver['deadtalk'] = "0"
+                csgo['deadtalk'] = "0"
                 break
 
             parser.set('csgo', 'deadtalk', csgo['deadtalk'])
@@ -710,6 +731,8 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'timelimit': parser.get("csgo", "timelimit"),
                 'buytime': parser.get("csgo", "buytime"),
                 'warmup_period': parser.get("csgo", "warmup_period"),
+                'gamemode': parser.get("csgo", "gamemode"),
+                'mapgroup': parser.get("csgo", "mapgroup"),
             }
 
             srcds_vars.update({
@@ -729,6 +752,21 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                         'buytime': csgo['buytime'],
                         'warmup_period': csgo['warmup_period'],
             })
+
+            # CSGO gamemodes defined here.
+
+            if csgo['gamemode'] == 'casual':
+                gameserver['extra_parameters'] = "+game_type 0 +game_mode 0"
+            elif csgo['gamemode'] == 'competitive':
+                gameserver['extra_parameters'] = "+game_type 0 +game_mode 1"
+            elif csgo['gamemode'] == 'armsrace':
+                gameserver['extra_parameters'] = "+game_type 1 +game_mode 0"
+            elif csgo['gamemode'] == 'demolition':
+                gameserver['extra_parameters'] = "+game_type 1 +game_mode 1"
+            elif csgo['gamemode'] == 'deathmatch':
+                gameserver['extra_parameters'] = "+game_type 1 +game_mode 2"
+            elif csgo['gamemode'] == 'none':
+                gameserver['extra_parameters'] = ""
 
     if gameserver['name'] == 'bms':
         # Like CSGO above, build game-specific convars here.
@@ -779,10 +817,16 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
 # LAUNCH THE SERVER! \m/
 
 if gameserver['daemon'] == "srcds_run":
-    # Gameserver is srcds based. Form up a start command
-    launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
-    srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
-    print srcds_run
+    if gameserver['name'] == 'csgo':
+        launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
+        if csgo['mapgroup'] == 'none':
+            srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
+        else:
+            srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +mapgroup {mapgroup}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'], mapgroup=csgo['mapgroup'])
+    else:
+        # Gameserver is srcds based and not crazy like csgo. Form up a start command
+        launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
+        srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
 
     # Load up the screen
     s = Screen(gameserver['name'], True)
