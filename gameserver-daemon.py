@@ -7,6 +7,18 @@ import subprocess
 from jinja2 import Template
 from screenutils import list_screens, Screen
 
+print """
+  __  ___       _                                                                          _                                  
+ / _|/ _ \ _ __| | __ ____   __ _  __ _ _ __ ___   ___  ___  ___ _ ____   _____ _ __    __| | __ _  ___ _ __ ___   ___  _ __  
+| |_| | | | '__| |/ /|_  /  / _` |/ _` | '_ ` _ \ / _ \/ __|/ _ \ '__\ \ / / _ \ '__|  / _` |/ _` |/ _ \ '_ ` _ \ / _ \| '_ \ 
+|  _| |_| | |  |   <  / /  | (_| | (_| | | | | | |  __/\__ \  __/ |   \ V /  __/ |    | (_| | (_| |  __/ | | | | | (_) | | | |
+|_|  \___/|_|  |_|\_\/___|  \__, |\__,_|_| |_| |_|\___||___/\___|_|    \_/ \___|_|     \__,_|\__,_|\___|_| |_| |_|\___/|_| |_|
+                            |___/                                                                                             
+
+It does the work, so you don't have to!
+
+"""
+
 parser = ConfigParser.SafeConfigParser()
 
 CONFIG_FILE = "server.conf"
@@ -49,6 +61,24 @@ if os.path.isfile(CONFIG_FILE):
         'pure': parser.get("gameserver", "pure"),
         'consistency': parser.get("gameserver", "consistency"),
         'extra_parameters': parser.get("gameserver", "extra_parameters"),
+        'password': parser.get("gameserver", "password"),
+        'rcon_banpenalty': parser.get("gameserver", "rcon_banpenalty"),
+        'rcon_minfailures': parser.get("gameserver", "rcon_minfailures"),
+        'rcon_maxfailures': parser.get("gameserver", "rcon_maxfailures"),
+        'rcon_maxfailuretime': parser.get("gameserver", "rcon_maxfailuretime"),
+        'rcon_maxpacketsize': parser.get("gameserver", "rcon_maxpacketsize"),
+        'rcon_maxpacketbans': parser.get("gameserver", "rcon_maxpacketbans"),
+        'log': parser.get("gameserver", "log"),
+        'logbans': parser.get("gameserver", "logbans"),
+        'logecho': parser.get("gameserver", "logecho"),
+        'logfile': parser.get("gameserver", "logfile"),
+        'log_onefile': parser.get("gameserver", "log_onefile"),
+        'net_maxfilesize': parser.get("gameserver", "net_maxfilesize"),
+        'downloadurl': parser.get("gameserver", "downloadurl"),
+        'allowdownload': parser.get("gameserver", "allowdownload"),
+        'allowupload': parser.get("gameserver", "allowupload"),
+        'pure_kick_clients': parser.get("gameserver", "pure_kick_clients"),
+        'pure_trace': parser.get("gameserver", "pure_trace"),
         }
 
     # Logic for false variables
@@ -279,14 +309,198 @@ else:
     parser.set('gameserver', 'pure', gameserver['pure'])
 
     while True:
-        user_input = raw_input("sv_consistency: [0] ")
+        user_input = raw_input("sv_consistency: [1] ")
         if user_input:
             gameserver['consistency'] = user_input
             break
-        gameserver['consistency'] = "0"
+        gameserver['consistency'] = "1"
         break
 
     parser.set('gameserver', 'consistency', gameserver['consistency'])
+
+    while True:
+        user_input = raw_input("sv_password: [none] ")
+        if user_input:
+            gameserver['password'] = user_input
+            break
+        gameserver['password'] = ""
+        break
+
+    parser.set('gameserver', 'password', gameserver['password'])
+
+
+    while True:
+        user_input = raw_input("sv_rcon_banpenalty: [15] ")
+        if user_input:
+            gameserver['rcon_banpenalty'] = user_input
+            break
+        gameserver['rcon_banpenalty'] = "15"
+        break
+
+    parser.set('gameserver', 'rcon_banpenalty', gameserver['rcon_banpenalty'])
+
+    while True:
+        user_input = raw_input("sv_rcon_minfailures: [5] ")
+        if user_input:
+            gameserver['rcon_minfailures'] = user_input
+            break
+        gameserver['rcon_minfailures'] = "5"
+        break
+
+    parser.set('gameserver', 'rcon_minfailures', gameserver['rcon_minfailures'])
+
+    while True:
+        user_input = raw_input("sv_rcon_maxfailures: [10] ")
+        if user_input:
+            gameserver['rcon_maxfailures'] = user_input
+            break
+        gameserver['rcon_maxfailures'] = "10"
+        break
+
+    parser.set('gameserver', 'rcon_maxfailures', gameserver['rcon_maxfailures'])
+
+    while True:
+        user_input = raw_input("sv_rcon_maxfailuretime: [30] ")
+        if user_input:
+            gameserver['rcon_maxfaiuretime'] = user_input
+            break
+        gameserver['rcon_maxfaiuretime'] = "30"
+        break
+
+    parser.set('gameserver', 'rcon_maxfailuretime', gameserver['rcon_maxfailuretime'])
+
+    while True:
+        user_input = raw_input("sv_rcon_maxpacketsize: [1024] ")
+        if user_input:
+            gameserver['rcon_maxpacketsize'] = user_input
+            break
+        gameserver['rcon_maxpacketsize'] = "1024"
+        break
+
+    parser.set('gameserver', 'rcon_maxpacketsize', gameserver['rcon_maxpacketsize'])
+
+    while True:
+        user_input = raw_input("sv_rcon_maxpacketbans: [1] ")
+        if user_input:
+            gameserver['rcon_maxpacketbans'] = user_input
+            break
+        gameserver['rcon_maxpacketbans'] = "1"
+        break
+
+    parser.set('gameserver', 'rcon_maxpacketbans', gameserver['rcon_maxpacketbans'])
+
+    while True:
+        user_input = raw_input("log : [on] ")
+        if user_input:
+            gameserver['log'] = user_input
+            break
+        gameserver['log'] = "on"
+        break
+
+    parser.set('gameserver', 'log', gameserver['log'])
+
+    while True:
+        user_input = raw_input("sv_logbans : [1] ")
+        if user_input:
+            gameserver['logbans'] = user_input
+            break
+        gameserver['logbans'] = "1"
+        break
+
+    parser.set('gameserver', 'logbans', gameserver['logbans'])
+
+    while True:
+        user_input = raw_input("sv_logecho : [1] ")
+        if user_input:
+            gameserver['logecho'] = user_input
+            break
+        gameserver['logecho'] = "1"
+        break
+
+    parser.set('gameserver', 'logecho', gameserver['logecho'])
+
+    while True:
+        user_input = raw_input("sv_logfile : [1] ")
+        if user_input:
+            gameserver['logfile'] = user_input
+            break
+        gameserver['logfile'] = "on"
+        break
+
+    parser.set('gameserver', 'logfile', gameserver['logfile'])
+
+    while True:
+        user_input = raw_input("sv_log_onefile : [0] ")
+        if user_input:
+            gameserver['log_onefile'] = user_input
+            break
+        gameserver['log_onefile'] = "0"
+        break
+
+    parser.set('gameserver', 'log_onefile', gameserver['log_onefile'])
+
+### NEW VARS TO BE ADDED TO CONFIG ###
+    while True:
+        user_input = raw_input("net_maxfilesize: [64] ")
+        if user_input:
+            gameserver['net_maxfilesize'] = user_input
+            break
+        gameserver['net_maxfilesize'] = "64"
+        break
+
+    parser.set('gameserver', 'net_maxfilesize', gameserver['net_maxfilesize'])
+
+    while True:
+        user_input = raw_input("sv_downloadurl: [] ")
+        if user_input:
+            gameserver['downloadurl'] = user_input
+            break
+        gameserver['downloadurl'] = ""
+        break
+
+    parser.set('gameserver', 'downloadurl', gameserver['downloadurl'])
+
+    while True:
+        user_input = raw_input("sv_allowdownload: [1] ")
+        if user_input:
+            gameserver['allowdownload'] = user_input
+            break
+        gameserver['allowdownload'] = "1"
+        break
+
+    parser.set('gameserver', 'allowdownload', gameserver['allowdownload'])
+
+    while True:
+        user_input = raw_input("sv_allowupload: [1] ")
+        if user_input:
+            gameserver['allowupload'] = user_input
+            break
+        gameserver['allowupload'] = "1"
+        break
+
+    parser.set('gameserver', 'allowupload', gameserver['allowupload'])
+
+    while True:
+        user_input = raw_input("sv_pure_kick_clients: [0] ")
+        if user_input:
+            gameserver['pure_kick_clients'] = user_input
+            break
+        gameserver['pure_kick_clients'] = "0"
+        break
+
+    parser.set('gameserver', 'pure_kick_clients', gameserver['pure_kick_clients'])
+
+    while True:
+        user_input = raw_input("sv_pure_trace: [0] ")
+        if user_input:
+            gameserver['pure_trace'] = user_input
+            break
+        gameserver['pure_trace'] = "0"
+        break
+
+    parser.set('gameserver', 'pure_trace', gameserver['pure_trace'])
+
+
 
     # ----------------------
     # CSGO Specific options
@@ -320,7 +534,7 @@ else:
             parser.set('csgo', 'gamemode', csgo['gamemode'])
 
             while True:
-                user_input = raw_input("Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none ")
+                user_input = raw_input("Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none : ")
                 if user_input == 'mg_op_op06' or user_input == 'mg_op_op05' or user_input == 'mg_op_breakout' or user_input == 'mg_active' or user_input == 'mg_reserves' or user_input == 'mg_armsrace' or user_input == 'mg_demolition' or user_input == 'none':
                     csgo['mapgroup'] = user_input
                     break
@@ -556,6 +770,18 @@ else:
 
             parser.set('tf', 'timelimit', tf['timelimit'])
 
+            while True:
+                user_input = raw_input("tf_overtime_nag: [0] ")
+                if user_input:
+                    tf['overtime_nag'] = user_input
+                    break
+                tf['overtime_nag'] = "0"
+                break
+
+            parser.set('tf', 'overtime_nag', tf['overtime_nag'])
+
+
+
 
 
     # ------------------------------
@@ -706,6 +932,24 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'voiceenable': gameserver['voiceenable'],
                 'pure': gameserver['pure'],
                 'consistency': gameserver['consistency'],
+                'password': gameserver['password'],
+                'rcon_banpenalty': gameserver['rcon_banpenalty'],
+                'rcon_minfailures': gameserver['rcon_minfailures'],
+                'rcon_maxfailures': gameserver['rcon_maxfailures'],
+                'rcon_minfailuretime': gameserver['rcon_minfailuretime'],
+                'rcon_maxpacketsize': gameserver['rcon_maxpacketsize'],
+                'rcon_maxpacketbans': gameserver['rcon_maxpacketbans'],
+                'log': gameserver['log'],
+                'logbans': gameserver['logbans'],
+                'logecho': gameserver['logecho'],
+                'logfile': gameserver['logfile'],
+                'log_onefile': gameserver['log_onefile'],
+                'net_maxfilesize': gameserver['net_maxfilesize'],
+                'downloadurl': gameserver['downloadurl'],
+                'allowdownload': gameserver['allowdownload'],
+                'allowupload': gameserver['allowupload'],
+                'pure_kick_clients': gameserver['pure_kick_clients'],
+                'pure_trace': gameserver['pure_trace'],
     }
 
     if gameserver['name'] == 'csgo':
@@ -788,10 +1032,12 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
         if gameserver['extra_parameters'] == "":
             tf = {
                 'timelimit': parser.get("tf", "timelimit"),
+                'overtime_nag': parser.get("tf", "overtime_nag"),
             }
 
             srcds_vars.update({
                 'timelimit': tf['timelimit'],
+                'overtime_nag': tf['overtime_nag']
             })
 
     if gameserver['name'] == 'hl2mp':
