@@ -362,9 +362,9 @@ else:
     while True:
         user_input = raw_input("sv_rcon_maxfailuretime: [30] ")
         if user_input:
-            gameserver['rcon_maxfaiuretime'] = user_input
+            gameserver['rcon_maxfailuretime'] = user_input
             break
-        gameserver['rcon_maxfaiuretime'] = "30"
+        gameserver['rcon_maxfailuretime'] = "30"
         break
 
     parser.set('gameserver', 'rcon_maxfailuretime', gameserver['rcon_maxfailuretime'])
@@ -936,7 +936,7 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'rcon_banpenalty': gameserver['rcon_banpenalty'],
                 'rcon_minfailures': gameserver['rcon_minfailures'],
                 'rcon_maxfailures': gameserver['rcon_maxfailures'],
-                'rcon_minfailuretime': gameserver['rcon_minfailuretime'],
+                'rcon_maxfailuretime': gameserver['rcon_maxfailuretime'],
                 'rcon_maxpacketsize': gameserver['rcon_maxpacketsize'],
                 'rcon_maxpacketbans': gameserver['rcon_maxpacketbans'],
                 'log': gameserver['log'],
