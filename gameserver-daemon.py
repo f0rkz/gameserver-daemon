@@ -79,6 +79,7 @@ if os.path.isfile(CONFIG_FILE):
         'allowupload': parser.get("gameserver", "allowupload"),
         'pure_kick_clients': parser.get("gameserver", "pure_kick_clients"),
         'pure_trace': parser.get("gameserver", "pure_trace"),
+        'motd': parser.get("gameserver", "motd"),
         }
 
     # Logic for false variables
@@ -500,6 +501,16 @@ else:
 
     parser.set('gameserver', 'pure_trace', gameserver['pure_trace'])
 
+    while True:
+        user_input = raw_input("MOTD URL: []")
+        if user_input:
+            gameserver['motd'] = user_input
+            break
+        gameserver['motd'] = ""
+        break
+
+    parser.set('gameserver', 'motd', gameserver['motd'])
+
 
 
     # ----------------------
@@ -780,6 +791,10 @@ else:
 
             parser.set('tf', 'overtime_nag', tf['overtime_nag'])
 
+            # Since this is set after the server is running, just give it a blank value for configuration later
+            parser.set('tf', 'tf_server_identity_account_id', "")
+            parser.set('tf', 'tf_server_identity_token', "")
+
 
 
 
@@ -913,6 +928,21 @@ with open(os.path.join('templates', 'runscript.txt'), "r") as file:
     with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
         outfile.write(output)
 
+# motd.txt
+with open(os.path.join('templates', 'motd.txt'), "r") as file:
+    x = file.read()
+
+    template = Template(x)
+
+    motd_vars = {
+                'motd': gameserver['motd'],
+    }
+
+    output = template.render(motd_vars)
+
+    with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'motd.txt'), "wb") as outfile:
+        outfile.write(output)
+
 # Configuration settings
 
 with open(os.path.join('templates', 'server.cfg'), "r") as file:
@@ -1033,11 +1063,15 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
             tf = {
                 'timelimit': parser.get("tf", "timelimit"),
                 'overtime_nag': parser.get("tf", "overtime_nag"),
+                'tf_server_identity_token': parser.get("tf", "tf_server_identity_token"),
+                'tf_server_identity_account_id': parser.get("tf", "tf_server_identity_account_id"),
             }
 
             srcds_vars.update({
                 'timelimit': tf['timelimit'],
-                'overtime_nag': tf['overtime_nag']
+                'overtime_nag': tf['overtime_nag'],
+                'tf_server_identity_token': tf['tf_server_identity_token'],
+                'tf_server_identity_account_id': tf['tf_server_identity_account_id'],
             })
 
     if gameserver['name'] == 'hl2mp':
