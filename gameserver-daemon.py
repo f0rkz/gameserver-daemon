@@ -1109,7 +1109,7 @@ if gameserver['daemon'] == "srcds_run":
             srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +mapgroup {mapgroup}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'], mapgroup=csgo['mapgroup'])
     elif gameserver['name'] == 'bms':
         launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
-        srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +exec servercustom.cfg'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
+        srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +servercfgfile servercustom.cfg'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
     else:
         # Gameserver is srcds based and not crazy like csgo. Form up a start command
         launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
