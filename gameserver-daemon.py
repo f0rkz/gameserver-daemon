@@ -791,6 +791,16 @@ else:
 
             parser.set('tf', 'overtime_nag', tf['overtime_nag'])
 
+            if not mvm_enable:
+                while True:
+                    user_input = raw_input("tf_mm_servermode: [1] ")
+                    if user_input:
+                        tf['mm_servermode'] = user_input
+                        break
+                    tf['mm_servermode'] = "1"
+                    break
+                parser.set('tf', 'mm_servermode', tf['mm_servermode'])
+
             # Since this is set after the server is running, just give it a blank value for configuration later
             parser.set('tf', 'tf_server_identity_account_id', "")
             parser.set('tf', 'tf_server_identity_token', "")
@@ -1065,6 +1075,7 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'overtime_nag': parser.get("tf", "overtime_nag"),
                 'tf_server_identity_token': parser.get("tf", "tf_server_identity_token"),
                 'tf_server_identity_account_id': parser.get("tf", "tf_server_identity_account_id"),
+                'servermode': parser.get("tf", "mm_servermode"),
             }
 
             srcds_vars.update({
