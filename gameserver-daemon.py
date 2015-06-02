@@ -19,7 +19,7 @@ It does the work, so you don't have to!
 
 """
 
-parser = ConfigParser.SafeConfigParser()
+parser = ConfigParser.RawConfigParser()
 
 CONFIG_FILE = "server.conf"
 STEAMCMD_DOWNLOAD = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
