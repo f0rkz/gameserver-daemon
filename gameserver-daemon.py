@@ -801,9 +801,9 @@ else:
                     break
                 parser.set('tf', 'mm_servermode', tf['mm_servermode'])
 
-            # Since this is set after the server is running, just give it a blank value for configuration later
-            parser.set('tf', 'tf_server_identity_account_id', "")
-            parser.set('tf', 'tf_server_identity_token', "")
+        # Since this is set after the server is running, just give it a blank value for configuration later
+        parser.set('tf', 'tf_server_identity_account_id', "")
+        parser.set('tf', 'tf_server_identity_token', "")
 
 
 
@@ -1085,6 +1085,16 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'tf_server_identity_account_id': tf['tf_server_identity_account_id'],
                 'servermode': tf['servermode'],
             })
+        else:
+            tf = {
+                'tf_server_identity_token': parser.get("tf", "tf_server_identity_token"),
+                'tf_server_identity_account_id': parser.get("tf", "tf_server_identity_account_id"),
+            }
+
+            srcds_vars.update({
+                'tf_server_identity_token': tf['tf_server_identity_token'],
+                'tf_server_identity_account_id': tf['tf_server_identity_account_id'],
+                })
 
     if gameserver['name'] == 'hl2mp':
         hl2mp = {
