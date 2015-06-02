@@ -1101,9 +1101,13 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
     # Output file.
     output = template.render(srcds_vars)
     
-    with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','server.cfg'), "wb") as outfile:
-        # Write the config.
-        outfile.write(output)
+    if gameserver['name'] == 'bms':
+        with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','servercustom.cfg'), "wb") as outfile:
+            outfile.write(output)
+    else:
+        with open(os.path.join(gameserver['path'],gameserver['name'],gameserver['name'],'cfg','server.cfg'), "wb") as outfile:
+            # Write the config.
+            outfile.write(output)
 
 # LAUNCH THE SERVER! \m/
 
@@ -1114,6 +1118,9 @@ if gameserver['daemon'] == "srcds_run":
             srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
         else:
             srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +mapgroup {mapgroup}'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'], mapgroup=csgo['mapgroup'])
+    elif gameserver['name'] == 'bms':
+        launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
+        srcds_run = '{path}/srcds_run {launch_parameters} {extra_parameters} +servercfgfile servercustom.cfg'.format(path=os.path.join(INSTALL_DIR, gameserver['name']), launch_parameters=launch, extra_parameters=gameserver['extra_parameters'])
     else:
         # Gameserver is srcds based and not crazy like csgo. Form up a start command
         launch = srcds_launch(gameserver['name'], gameserver['path'], gameserver['runscript'], gameserver['maxplayers'], gameserver['tickrate'], gameserver['port'], gameserver['ip'], gameserver['map'], gameserver['rcon'])
