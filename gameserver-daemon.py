@@ -1083,6 +1083,7 @@ with open(os.path.join('templates', 'server.cfg'), "r") as file:
                 'overtime_nag': tf['overtime_nag'],
                 'tf_server_identity_token': tf['tf_server_identity_token'],
                 'tf_server_identity_account_id': tf['tf_server_identity_account_id'],
+                'servermode': tf['servermode'],
             })
 
     if gameserver['name'] == 'hl2mp':
