@@ -144,6 +144,7 @@ class GameServer(object):
                 {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
         ]
 
+        # Method to take each options list above and process it. No more redundant loops!
 
         def configure_list(group, list):
             for config_object in list:
@@ -162,13 +163,19 @@ class GameServer(object):
                         break
                 parser.set(group['id'], config_object['option'], group[config_object['option']])
 
+        # Base steamcmd login info
+
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
         configure_list(steamcmd,steamcmd_options)
 
+        # Base gameserver information (common cvars)
+
         gameserver = {'id': 'gameserver'}
         parser.add_section('gameserver')
         configure_list(gameserver,gameserver_options)
+
+        # Each game that is supported here
 
         if gameserver['name'] == 'csgo':
             csgo = {'id': 'csgo'}
@@ -191,6 +198,8 @@ class GameServer(object):
             configure_list(bms,bms_options)
 
         else:
+            # Let the user know gameserver is not supported. This could be a user error or an actual game not supported.
+            
             print "Gameserver name {} not supported by this script. Base configuration options will be used.".format(gameserver['name'])
 
         # Write the configuration file
