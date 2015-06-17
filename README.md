@@ -11,14 +11,23 @@ everything in between.
 
 # Installation
 - Step 1: Clone the project
+
 `git clone http://codemonkey.f7lans.com/f0rkz/gameserver-daemon.git`
+
 - Step 2: Install lib32gcc1 (a dependancy required for steamcmd and srcds based servers)
+
 `sudo apt-get install lib32gcc1`
+
 - Step 3: Install the python-pip package
+
 `sudo apt-get install python-pip`
+
 - Step 4: Create the gameserver base directory
+
 `mkdir /home/steam/mygame.hostname.com`
+
 - Step 5: Install the python prerequisites
+
 `sudo pip install -r requirements.txt`
 
 # Running
@@ -51,4 +60,3 @@ Assuming you already configured your server, the `-u` or `--update` argument wil
 
 ## --validate
 See: `--update`
-
