@@ -65,7 +65,9 @@ Assuming you already configured your server, the `-u` or `--update` argument wil
 See: `--update`
 
 ## --runscript
-Generate the runscript.txt file used to update the gameserver at launch. Not required, but helpful!
+Generate the runscript.txt file used to update the gameserver at launch. Required for headless launch.
+
+I may add some fix later to ignore runscript.txt if it does not exist, but you really should be using a runscript!
 
 ## --servercfg
 Generate server.cfg from settings set in `--configure`. This is not required, but it is very helpful for automation.
