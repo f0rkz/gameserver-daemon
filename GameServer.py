@@ -241,7 +241,7 @@ class GameServer(object):
             with open(os.path.join(self.config['gameserver']['path'],'runscript.txt'), "wb") as outfile:
                 outfile.write(output)
 
-        sys.exit("runscript.txt created")
+        print "runscript.txt created"
 
 
     def create_servercfg(self):
