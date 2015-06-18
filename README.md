@@ -102,22 +102,22 @@ The following areas will need to be modified:
 
 GameServer.py line 26 has documentation on adding additional cvars:
 
-"""
-Configuration dictionaries template:
-thing [
-    {'option': '', 'info': '', 'default': ''},
-]
+  """
+  Configuration dictionaries template:
+  thing [
+      {'option': '', 'info': '', 'default': ''},
+  ]
 
-If you want to force a user to enter a value:
-thing [
-    {'option': '', 'info': ''},
-]
+  If you want to force a user to enter a value:
+  thing [
+      {'option': '', 'info': ''},
+  ]
 
-If you need to validate based on a list of options:
-thing [
-    {'option': '', 'info': '', 'valid_option': ['option1', 'option2', 'option3']},
-]
-"""
+  If you need to validate based on a list of options:
+  thing [
+      {'option': '', 'info': '', 'valid_option': ['option1', 'option2', 'option3']},
+  ]
+  """
 
 The next place is adding the cvar in the template file. Pretty easy to figure out if you take a look at it.
 
