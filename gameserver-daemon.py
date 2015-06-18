@@ -21,7 +21,6 @@ argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true
 argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
 argparser.add_argument("--servercfg", help="Generate the server.cfg file", action="store_true")
 argparser.add_argument("--motd", help="Generate the motd.txt", action="store_true")
-#argparser.add_argument("--express", help="Express settings.", action="store_true")
 args = argparser.parse_args()
 
 # Catch if the user is running the tool without a config.
