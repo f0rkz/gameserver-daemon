@@ -327,7 +327,7 @@ class GameServer(object):
             
         elif self.config['gameserver']['name'] == 'tf':
             # Catch mann versus machine
-            if self.config['tf']['mvm']:
+            if self.config['tf']['mvm'] == '1':
                 srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
                 extra_parameters = "+tf_mm_servermode 2"
             else:
