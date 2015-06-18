@@ -199,7 +199,7 @@ class GameServer(object):
 
         else:
             # Let the user know gameserver is not supported. This could be a user error or an actual game not supported.
-            
+
             print "Gameserver name {} not supported by this script. Base configuration options will be used.".format(gameserver['name'])
 
         # Write the configuration file
@@ -238,15 +238,42 @@ class GameServer(object):
 
             output = template.render(runscript_vars)
 
-            with open(os.path.join(gameserver['path'],gameserver['runscript']), "wb") as outfile:
+            with open(os.path.join(self.config['gameserver']['path'],'runscript.txt'), "wb") as outfile:
                 outfile.write(output)
+
+        sys.exit("runscript.txt created")
 
 
     def create_servercfg(self):
-        pass
+        with open(os.path.join('templates', 'server.cfg'), "r") as file:
+            x = file.read()
+            template = Template(x)
+
+            srcds_vars = self.config['gameserver']
+
+            if srcds_vars['name'] == 'csgo':
+                srcds_vars.update(self.config['csgo'])
+            
+            elif srcds_vars['name'] == 'bms':
+                srcds_vars.update(self.config['bms'])
+
+            elif srcds_vars['name'] == 'tf':
+                srcds_vars.update(self.config['tf'])
+
+            elif srcds_vars['name'] == 'hl2mp':
+                srcds_vars.update(self.config['hl2mp'])
+
+            output = template.render(srcds_vars)
+
+            if srcds_vars['name'] == 'bms':
+                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','servercustom.cfg'), "wb") as outfile:
+                    outfile.write(output)
+            else:
+                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','server.cfg'), "wb") as outfile:
+                    outfile.write(output)
+        print "server.cfg saved"
 
     def create_motd(self):
-        print "Triggered"
         with open(os.path.join('templates', 'motd.txt'), "r") as file:
             x = file.read()
 
@@ -260,6 +287,71 @@ class GameServer(object):
 
             with open(os.path.join(self.config['gameserver']['path'],self.config['gameserver']['name'],self.config['gameserver']['name'],'motd.txt'), "wb") as outfile:
                 outfile.write(output)
+        print "motd.txt saved"
+
+    def status(self):
+        s = Screen(self.config['gameserver']['name'])
+        is_server_running = s.exists
+        return is_server_running
 
     def start(self):
-        pass
+        # Catch CSGO gamemode and mapgroup, then start it up
+        if self.config['gameserver']['name'] == 'csgo':
+            if not self.config['csgo']['mapgroup'] == 'none':
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], mapgroup=self.config['csgo']['mapgroup'])
+            
+            else:
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+            
+            if not self.config['csgo']['gamemode'] == 'none':
+                
+                gamemode = self.config['csgo']['gamemode']
+                
+                if gamemode == 'casual':
+                    extra_parameters = "+game_type 0 +game_mode 0"
+
+                elif gamemode == 'competitive':
+                    extra_parameters = "+game_type 0 +game_mode 1"
+
+                elif gamemode == 'armsrace':
+                    extra_parameters = "+game_type 1 +game_mode 0"
+
+                elif gamemode == 'demolition':
+                    extra_parameters = "+game_type 1 +game_mode 1"
+
+                elif gamemode == 'deathmatch':
+                    extra_parameters = "+game_type 1 +game_mode 2"
+            else:
+                gamemode_launch = ''
+            
+            
+        elif self.config['gameserver']['name'] == 'tf':
+            # Catch mann versus machine
+            if self.config['tf']['mvm']:
+                srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+                extra_parameters = "+tf_mm_servermode 2"
+            else:
+                srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+                extra_parameters = ''
+            
+        elif self.config['gameserver']['name'] == 'bms':
+            # Catch alrternative configuration file, then start it up
+            srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+            extra_parameters = ''
+
+        else:
+            srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+            extra_parameters = ''
+
+        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=os.path.join(self.config['gameserver']['path'],self.config['gameserver']['name']), launch=srcds_launch, extra=extra_parameters)
+
+        s = Screen(self.config['gameserver']['name'], True)
+        s.send_commands(srcds_run)
+
+    def stop(self):
+        if self.status():
+            s = Screen(self.config['gameserver']['name'])
+            s.kill()
+            print "Server stopped."
+        else:
+           print "Server is not running."

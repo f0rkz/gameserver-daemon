@@ -45,62 +45,47 @@ if args.configure:
         myserver.configure()
 
 if args.update:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
+    parser.read(CONFIG_FILE)
+    gameserver = parser._sections
+    myserver = GameServer(gsconfig=gameserver)
+
+    install_dir = os.path.dirname(gameserver['gameserver']['path'])
+
+    if not os.path.isfile(os.path.join(install_dir, 'steamcmd.sh')):
+        print "Steamcmd was not found. Installing steamcmd."
+        myserver.install_steamcmd()
+
+    if args.validate:
+        myserver.update_game_validate()
 
     else:
-        parser.read(CONFIG_FILE)
-        gameserver = parser._sections
-        myserver = GameServer(gsconfig=gameserver)
-
-        install_dir = os.path.dirname(gameserver['gameserver']['path'])
-
-        if not os.path.isfile(os.path.join(install_dir, 'steamcmd.sh')):
-            print "Steamcmd was not found. Installing steamcmd."
-            myserver.install_steamcmd()
-
-        if args.validate:
-            myserver.update_game_validate()
-
-        else:
-            myserver.update_game_novalidate()
+        myserver.update_game_novalidate()
 
 if args.steamcmd:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
-
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
     myserver.install_steamcmd()
 
 if args.validate:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     if args.update is False:
         print "Use the --update argument with --validate to use this option properly."
         print "Example: python gameserver-daemon.py --update --validate"
         exit()
 
 if args.servercfg:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
     myserver.create_servercfg()
 
 if args.motd:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
     myserver.create_motd()
 
 if args.runscript:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
@@ -108,24 +93,21 @@ if args.runscript:
 
 
 if args.start:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
-    myserver.start()
+    if myserver.status():
+        sys.exit("Server is running. Please stop or restart your server.")
+    else:
+        myserver.start()
 
 if args.stop:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
     myserver.stop()
 
 if args.restart:
-    if not os.path.isfile(CONFIG_FILE):
-        sys.exit("No configuration found. Run the script with the --configure option")
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)

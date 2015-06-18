@@ -1,4 +1,4 @@
 login {{ steamlogin }} {{ steampassword }}
 force_install_dir {{ install_dir }}
-app_update {{ appid }} validate
+app_update {{ appid }}
 quit
