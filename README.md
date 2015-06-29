@@ -12,7 +12,7 @@ everything in between.
 # Installation
 - Step 1: Clone the project
 
-`git clone http://codemonkey.f7lans.com/f0rkz/gameserver-daemon.git`
+`git clone git@github.com:f0rkz/gameserver-daemon.git`
 
 - Step 2: Install lib32gcc1 (a dependancy required for steamcmd and srcds based servers)
 
