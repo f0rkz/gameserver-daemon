@@ -215,6 +215,11 @@ class GameServer(object):
             parser.add_section('bms')
             configure_list(bms,bms_options)
 
+        elif gameserver['name'] == 'l4d2':
+            l4d2 = {'id': 'l4d2'}
+            parser.add_section('l4d2')
+            configure_list(l4d2,l4d2_options)
+
         else:
             # Let the user know gameserver is not supported. This could be a user error or an actual game not supported.
 
