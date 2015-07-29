@@ -215,7 +215,7 @@ class GameServer(object):
             parser.add_section('bms')
             configure_list(bms,bms_options)
 
-        elif gameserver['name'] == 'l4d2':
+        elif gameserver['name'] == 'left4dead2':
             l4d2 = {'id': 'l4d2'}
             parser.add_section('l4d2')
             configure_list(l4d2,l4d2_options)
@@ -286,7 +286,7 @@ class GameServer(object):
             elif srcds_vars['name'] == 'hl2mp':
                 srcds_vars.update(self.config['hl2mp'])
 
-            elif srcds_vars['name'] == 'l4d2':
+            elif srcds_vars['name'] == 'left4dead2':
                 srcds_vars.update(self.config['l4d2'])
 
             output = template.render(srcds_vars)
@@ -365,7 +365,7 @@ class GameServer(object):
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
-        elif self.config['gameserver']['name'] == 'l4d2':
+        elif self.config['gameserver']['name'] == 'left4dead2':
             srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], fork=self.config['l4d2']['fork'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
 
         else:
