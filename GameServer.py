@@ -147,6 +147,21 @@ class GameServer(object):
                 {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
         ]
 
+        # -----------------------------------------
+        # Left 4 Dead 2 (l4d2) gameserver options
+        # -----------------------------------------
+
+        l4d2_options = [
+                {'option': 'fork', 'info': 'How many server forks: [0] ', 'default': '0'},
+                {'option': 'mp_disable_autokick', 'info': 'mp_disable_autokick: [0] ', 'default': '0'},
+                {'option': 'sv_gametypes', 'info': 'sv_gametypes: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
+                {'option': 'mp_gamemode', 'info': 'sv_gamemode: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
+                {'option': 'sv_unlag', 'info': 'sv_unlag: [1] ', 'default': '1'},
+                {'option': 'sv_maxunlag', 'info': 'sv_maxunlag: [.5] ', 'default': '.5'},
+                {'option': 'sv_steamgroup_exclusive', 'info': 'sv_steamgroup_exclusive: [0] ', 'default': '0'},
+
+        ]
+
         # Method to take each options list above and process it. No more redundant loops!
 
         def configure_list(group, list):
@@ -266,6 +281,9 @@ class GameServer(object):
             elif srcds_vars['name'] == 'hl2mp':
                 srcds_vars.update(self.config['hl2mp'])
 
+            elif srcds_vars['name'] == 'l4d2':
+                srcds_vars.update(self.config['l4d2'])
+
             output = template.render(srcds_vars)
 
             if srcds_vars['name'] == 'bms':
@@ -331,19 +349,22 @@ class GameServer(object):
         elif self.config['gameserver']['name'] == 'tf':
             # Catch mann versus machine
             if self.config['tf']['mvm'] == '1':
-                srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
                 extra_parameters = "+tf_mm_servermode 2"
             else:
-                srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
                 extra_parameters = ''
             
         elif self.config['gameserver']['name'] == 'bms':
             # Catch alrternative configuration file, then start it up
-            srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
+        elif self.config['gameserver']['name'] == 'l4d2':
+            srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], fork=self.config['l4d2']['fork'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+
         else:
-            srcds_launch =  srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
         srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=os.path.join(self.config['gameserver']['path'],self.config['gameserver']['name']), launch=srcds_launch, extra=extra_parameters)
