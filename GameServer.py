@@ -7,9 +7,160 @@ import tarfile
 from jinja2 import Template
 from screenutils import list_screens, Screen
 
-
-parser = ConfigParser.RawConfigParser()
+# Important constants within the class
 CONFIG_FILE = "server.conf"
+STEAMCMD_DOWNLOAD = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+
+# Configuration parser variable. Don't touch this.
+parser = ConfigParser.RawConfigParser()
+
+class GameServer(object):
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['gameserver']['appid']),
+            }
+
+    """
+    Configuration method of the shared information between engines
+    """
+    def configure(self):
+        """
+        Host of steamcmd options and data about the game files
+        """
+        steamcmd_options = [
+                {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
+                {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
+                {'option': 'basepath', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
+                {'option': 'appid', 'info': 'Steam AppID: '},
+        ]
+
+        """
+        Method used to loop through configuration lists and prompt the user
+        """
+        def configure_list(group, list):
+            for config_object in list:
+                while True:
+                    user_input = raw_input(config_object['info'])
+                    if user_input:
+                        if config_object.get('valid_option') and not user_input in config_object['valid_option']:
+                            print "Invalid option. Please chose one of the following: {}".format(config_object['valid_option'])
+                        else:
+                            group[config_object['option']] = user_input
+                            break
+                    if not config_object.get('default', None):
+                        pass #loop back and ask again
+                    else:
+                        group[config_object['option']] = config_object['default']   # Default value set!
+                        break
+                parser.set(group['id'], config_object['option'], group[config_object['option']])
+        """
+        Run the steam cmd configuration items
+        """
+        steamcmd = {'id': 'steamcmd'}   # I don't think this is needed.
+        parser.add_section('steamcmd')
+        configure_list(steamcmd,steamcmd_options)
+
+        parser.write(open(CONFIG_FILE, 'w'))
+        print "Configuration file saved as {}".format(CONFIG_FILE)
+        # Base configuration is saved now. We can configure it with gameserver options
+
+        """
+        Now we call the correct class for configuring each game type that we
+        support.
+        """
+        # Load up the configuration file so we can parse the appid
+        parser.read(CONFIG_FILE)
+        gameserver_settings = parser._sections
+        steam_appid = gameserver_settings['steamcmd']['appid']
+
+        """
+        Begin parsing the app id and routing it to the correct class
+        """
+        # ARK: Survival Evolved
+        if steam_appid == '376030':
+            pass
+
+        # Team Fotress 2
+        elif steam_appid == '232250':
+            pass
+
+        # Counter-Strike: GO
+        elif steam_appid == '740':
+            pass
+
+        # Half-Life 2: deathmatch
+        elif steam_appid == '232370':
+            pass
+
+        # Black Mesa
+        elif steam_appid == '346680':
+            pass
+
+        # Left4Dead2
+        elif steam_appid == '222860':
+            pass
+
+    """
+    Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
+    link changes. STEAMCMD_DOWNLOAD can be fond at the top of this class file.
+    """
+    def install_steamcmd(self):
+        if self.gsconfig:
+            INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
+            #Download steamcmd and extract it
+            urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
+            steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
+            steamcmd_tar.extractall(INSTALL_DIR)
+        else:
+            print "Error: No configuration file found. Please run with the --configure option"
+
+    """
+    Method to update game files with the validate option
+    """
+    def update_game_validate(self):
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        subprocess.call(steamcmd_run, shell=True)
+
+    """
+    Method to update game files without the validate option
+    """
+    def update_game_novalidate(self):
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        subprocess.call(steamcmd_run, shell=True)
+
+class SRCDSGameServer(GameServer):
+    def __init__(self):
+        pass
+
+    def configure(self):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+class UnrealGameServer(GameServer):
+    def __init__(self):
+        pass
+
+    def configure(self):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+
+
+"""
+Begin old class
 
 class GameServer(object):
     def __init__(self, gsconfig):
@@ -28,7 +179,7 @@ class GameServer(object):
         thing [
             {'option': '', 'info': '', 'default': ''},
         ]
-        
+
         If you want to force a user to enter a value:
         thing [
             {'option': '', 'info': ''},
@@ -133,7 +284,7 @@ class GameServer(object):
                 {'option': 'overtime_nag', 'info': 'tf_overtime_nag: [0] ', 'default': '0'},
                 {'option': 'tf_mm_servermode', 'info': 'tf_mm_servermode [1] ', 'default': '1', 'valid_option': ['0', '1', '2']},
                 {'option': 'tf_server_identity_account_id', 'info': 'tf_server_identity_account_id: [none]', 'default': 'ignore'},
-                {'option': 'tf_server_identity_token', 'info': 'tf_server_identity_token: [none]', 'default': 'ignore'}, 
+                {'option': 'tf_server_identity_token', 'info': 'tf_server_identity_token: [none]', 'default': 'ignore'},
                 {'option': 'mp_disable_respawn_times', 'info': 'mp_disable_respawn_times: [0]', 'default': '0', 'valid_option': ['0', '1']},
         ]
 
@@ -276,7 +427,7 @@ class GameServer(object):
 
             if srcds_vars['name'] == 'csgo':
                 srcds_vars.update(self.config['csgo'])
-            
+
             elif srcds_vars['name'] == 'bms':
                 srcds_vars.update(self.config['bms'])
 
@@ -325,14 +476,14 @@ class GameServer(object):
         if self.config['gameserver']['name'] == 'csgo':
             if not self.config['csgo']['mapgroup'] == 'none':
                 srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], mapgroup=self.config['csgo']['mapgroup'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
-            
+
             else:
                 srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
-            
+
             if not self.config['csgo']['gamemode'] == 'none':
-                
+
                 gamemode = self.config['csgo']['gamemode']
-                
+
                 if gamemode == 'casual':
                     extra_parameters = "+game_type 0 +game_mode 0"
 
@@ -349,8 +500,8 @@ class GameServer(object):
                     extra_parameters = "+game_type 1 +game_mode 2"
             else:
                 gamemode_launch = ''
-            
-            
+
+
         elif self.config['gameserver']['name'] == 'tf':
             # Catch mann versus machine
             if self.config['tf']['mvm'] == '1':
@@ -359,7 +510,7 @@ class GameServer(object):
             else:
                 srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
                 extra_parameters = ''
-            
+
         elif self.config['gameserver']['name'] == 'bms':
             # Catch alrternative configuration file, then start it up
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
@@ -385,3 +536,4 @@ class GameServer(object):
             print "Server stopped."
         else:
            print "Server is not running."
+"""
