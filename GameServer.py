@@ -20,24 +20,13 @@ class GameServer(object):
         if self.gsconfig:
             self.path = {
                 'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
-                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['gameserver']['appid']),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
             }
 
     """
     Configuration method of the shared information between engines
     """
     def configure(self):
-        """
-        Host of steamcmd options and data about the game files
-        """
-        steamcmd_options = [
-                {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
-                {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
-                {'option': 'basepath', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
-                {'option': 'appid', 'info': 'Steam AppID: '},
-                {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
-        ]
-
         """
         Method used to loop through configuration lists and prompt the user
         """
@@ -57,8 +46,19 @@ class GameServer(object):
                         group[config_object['option']] = config_object['default']   # Default value set!
                         break
                 parser.set(group['id'], config_object['option'], group[config_object['option']])
+
         """
-        Run the steam cmd configuration items
+        Host of steamcmd options and data about the game files
+        """
+        steamcmd_options = [
+                {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
+                {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
+                {'option': 'basepath', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
+                {'option': 'appid', 'info': 'Steam AppID: '},
+                {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
+        ]
+        """
+        Save the steam cmd configuration items
         """
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
@@ -69,8 +69,8 @@ class GameServer(object):
         # Base configuration is saved now. We can configure it with gameserver options
 
         """
-        Now we call the correct class for configuring each game type that we
-        support.
+        Load up the recently saved configuration so we can get basic information
+        about the game.
         """
         # Load up the configuration file so we can parse the appid
         parser.read(CONFIG_FILE)
@@ -79,7 +79,7 @@ class GameServer(object):
         engine = gameserver_settings['steamcmd']['engine']
 
         """
-        Begin parsing the app id and routing it to the correct class
+        Here be options
         """
         # Catch if the server is unreal or srcds. It matters.
         if engine == 'unreal':
@@ -91,9 +91,19 @@ class GameServer(object):
 
             # ARK: Survival Evolved
             if steam_appid == '376030':
-                pass
+                #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
+                options = [
+                    {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': ''},
+                    {'option': 'ServerAdminPassword', 'info': 'Admin Password [reset_me]', 'default': 'reset_me'},
+                ]
+
             # Killing Floor 1
             elif steam_appid == '215360':
+                pass
+
+            # Killing Floor 2 (lol just kidding.)
+            # Probably need to update this whenever KF2 gets linux support
+            elif steam_appid == '232130':
                 pass
 
         elif engine == 'srcds':
@@ -171,11 +181,11 @@ class GameServer(object):
 
             # Half-Life 2: deathmatch
             elif steam_appid == '232370':
-                options.append(
+                options.append([
                     {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
                     {'option': 'timelimit', 'info': 'mp_timelimit: [30] ', 'default': '30'},
                     {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
-                )]
+                ])
 
             # Black Mesa
             elif steam_appid == '346680':
@@ -214,7 +224,7 @@ class GameServer(object):
 
     """
     Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
-    link changes. STEAMCMD_DOWNLOAD can be fond at the top of this class file.
+    link changes. STEAMCMD_DOWNLOAD can be found at the top of this class file.
     """
     def install_steamcmd(self):
         if self.gsconfig:
@@ -241,30 +251,50 @@ class GameServer(object):
         subprocess.call(steamcmd_run, shell=True)
 
 class SRCDSGameServer(GameServer):
-    def __init__(self):
-        pass
-
-    def configure(self):
-        pass
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid'])
+            }
 
     def start(self):
-        pass
+        steam_appid = gameserver_settings['steamcmd']['appid']
 
     def stop(self):
-        pass
+        if self.status():
+            s = Screen(self.config['gameserver']['name'])
+            s.kill()
+            print "Server stopped."
+        else:
+           print "Server is not running."
 
 class UnrealGameServer(GameServer):
-    def __init__(self):
-        pass
-
-    def configure(self):
-        pass
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def start(self):
-        pass
+        steam_appid = gameserver_settings['steamcmd']['appid']
+        # Start Ark
+        if steam_appid == '376030':
+            run_commands = '{gamedir}'
+
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
 
     def stop(self):
-        pass
+        if self.status():
+            s = Screen(self.config['gameserver']['name'])
+            s.kill()
+            print "Server stopped."
+        else:
+           print "Server is not running."
 
 
 
