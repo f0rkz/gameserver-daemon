@@ -239,7 +239,7 @@ class GameServer(object):
                     break
                 else:
                     # Create the directory
-                    os.makedirs(self.path['steamcmd']
+                    os.makedirs(self.path['steamcmd'])
         else:
             print "Error: No configuration file found. Please run with the --configure option"
 
