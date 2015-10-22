@@ -229,11 +229,17 @@ class GameServer(object):
     """
     def install_steamcmd(self):
         if self.gsconfig:
-            INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
-            #Download steamcmd and extract it
-            urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
-            steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
-            steamcmd_tar.extractall(INSTALL_DIR)
+            while True:
+                if os.path.exists(self.path['steamcmd']):
+                    INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
+                    #Download steamcmd and extract it
+                    urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
+                    steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
+                    steamcmd_tar.extractall(INSTALL_DIR)
+                    break
+                else:
+                    # Create the directory
+                    os.makedirs(self.path['steamcmd']
         else:
             print "Error: No configuration file found. Please run with the --configure option"
 
