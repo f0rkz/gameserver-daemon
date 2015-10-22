@@ -257,14 +257,14 @@ class GameServer(object):
     Method to update game files with the validate option
     """
     def update_game_validate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
         subprocess.call(steamcmd_run, shell=True)
 
     """
     Method to update game files without the validate option
     """
     def update_game_novalidate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
         subprocess.call(steamcmd_run, shell=True)
 
 class SRCDSGameServer(GameServer):

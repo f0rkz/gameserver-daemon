@@ -50,7 +50,7 @@ if args.update:
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
 
-    install_dir = os.path.dirname(gameserver['gameserver']['path'])
+    install_dir = os.path.join(gameserver['steamcmd']['path'], '')
 
     if not os.path.isfile(os.path.join(install_dir, 'steamcmd.sh')):
         print "Steamcmd was not found. Installing steamcmd."
