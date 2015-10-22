@@ -27,6 +27,7 @@ args = argparser.parse_args()
 if not os.path.isfile(CONFIG_FILE) and not args.configure:
     sys.exit("No configuration file found. Run: python gameserver-daemon.py --configure")
 
+# Configure the gameserver. This is apart of the GameServer class.
 if args.configure:
     if os.path.isfile(CONFIG_FILE):
         user_input = raw_input("server.conf already exists, overwrite? [Y/n]: ")
@@ -43,6 +44,7 @@ if args.configure:
         myserver = GameServer(gsconfig=gameserver)
         myserver.configure()
 
+# Update the gameserver. This is apart of the GameServer class.
 if args.update:
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
@@ -60,55 +62,67 @@ if args.update:
     else:
         myserver.update_game_novalidate()
 
+# Install steacmd. This is apart of the GameServer class.
 if args.steamcmd:
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     myserver = GameServer(gsconfig=gameserver)
     myserver.install_steamcmd()
 
+# Update with validate. This is apart of the GameServer class.
 if args.validate:
     if args.update is False:
         print "Use the --update argument with --validate to use this option properly."
         print "Example: python gameserver-daemon.py --update --validate"
         exit()
 
-if args.servercfg:
+# -------------------------
+# Game specific operations!
+# -------------------------
+if os.path.isfile(CONFIG_FILE):
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    myserver.create_servercfg()
+    engine = gameserver['steamcmd']['engine']
+    if engine == "srcds":
+        if args.servercfg:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            myserver.create_servercfg()
 
-if args.motd:
-    parser.read(CONFIG_FILE)
-    gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    myserver.create_motd()
+        if args.motd:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            myserver.create_motd()
 
-if args.runscript:
-    parser.read(CONFIG_FILE)
-    gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    myserver.create_runscript()
+        if args.runscript:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            myserver.create_runscript()
 
+        if args.start:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            if myserver.status():
+                sys.exit("Server is running. Please stop or restart your server.")
+            else:
+                myserver.start()
 
-if args.start:
-    parser.read(CONFIG_FILE)
-    gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    if myserver.status():
-        sys.exit("Server is running. Please stop or restart your server.")
-    else:
-        myserver.start()
+        if args.stop:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            myserver.stop()
 
-if args.stop:
-    parser.read(CONFIG_FILE)
-    gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    myserver.stop()
+        if args.restart:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = SRCDSGameServer(gsconfig=gameserver)
+            myserver.stop()
+            myserver.start()
 
-if args.restart:
-    parser.read(CONFIG_FILE)
-    gameserver = parser._sections
-    myserver = GameServer(gsconfig=gameserver)
-    myserver.stop()
-    myserver.start()
+    if engine == "unreal":
+        pass

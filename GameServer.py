@@ -11,6 +11,16 @@ from screenutils import list_screens, Screen
 CONFIG_FILE = "server.conf"
 STEAMCMD_DOWNLOAD = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 
+# Dictionary of game subdirectories for configuration
+GAME_DIRECTORY = {
+    '232250': 'tf',
+    '740': 'csgo',
+    '232370': 'hl2mp',
+    '346680': 'bms',
+    '222860': 'left4dead2',
+    '376030': 'ShooterGame',
+}
+
 # Configuration parser variable. Don't touch this.
 parser = ConfigParser.RawConfigParser()
 
@@ -284,9 +294,9 @@ class SRCDSGameServer(GameServer):
                 template = Template(x)
 
                 runscript_vars = {
-                                'steamlogin': self.config['steamcmd']['user'],
-                                'steampassword': self.config['steamcmd']['password'],
-                                'install_dir': os.path.join(self.path['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+                                'steamlogin': self.gsconfig['steamcmd']['user'],
+                                'steampassword': self.gsconfig['steamcmd']['password'],
+                                'install_dir': os.path.join(self.path['gamedir'], ''),
                                 'appid': self.config['steamcmd']['appid']
                 }
 
@@ -302,30 +312,16 @@ class SRCDSGameServer(GameServer):
             x = file.read()
             template = Template(x)
 
-            srcds_vars = self.gsconfig['gameserver']
-
-            if srcds_vars['name'] == 'csgo':
-                srcds_vars.update(self.config['csgo'])
-
-            elif srcds_vars['name'] == 'bms':
-                srcds_vars.update(self.config['bms'])
-
-            elif srcds_vars['name'] == 'tf':
-                srcds_vars.update(self.config['tf'])
-
-            elif srcds_vars['name'] == 'hl2mp':
-                srcds_vars.update(self.config['hl2mp'])
-
-            elif srcds_vars['name'] == 'left4dead2':
-                srcds_vars.update(self.config['l4d2'])
+            appid = self.gsconfig['steamcmd']['appid']
+            srcds_vars = self.gsconfig[appid]
 
             output = template.render(srcds_vars)
 
-            if srcds_vars['name'] == 'bms':
-                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','servercustom.cfg'), "wb") as outfile:
+            if appid == '346680':
+                with open(os.path.join(self.path['gamedir'],GAME_DIRECTORY[appid],'cfg','servercustom.cfg'), "wb") as outfile:
                     outfile.write(output)
             else:
-                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','server.cfg'), "wb") as outfile:
+                with open(os.path.join(self.path['gamedir'],GAME_DIRECTORY[appid],'cfg','server.cfg'), "wb") as outfile:
                     outfile.write(output)
         print "server.cfg saved"
 
