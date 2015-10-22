@@ -4,6 +4,7 @@ import ConfigParser
 import argparse
 import subprocess
 from GameServer import GameServer
+from GameServer import SRCDSGameServer
 
 
 CONFIG_FILE = "server.conf"
