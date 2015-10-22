@@ -92,7 +92,7 @@ class GameServer(object):
             # ARK: Survival Evolved
             if steam_appid == '376030':
                 #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
-                options = [
+                options += [
                     {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': ''},
                     {'option': 'ServerAdminPassword', 'info': 'Admin Password [reset_me]', 'default': 'reset_me'},
                 ]
@@ -147,7 +147,7 @@ class GameServer(object):
             # Team Fotress 2
             if steam_appid == '232250':
                 # Configuration options for TF2
-                options.append([
+                options += [
                     {'option': 'mvm', 'info': 'Mann Versus Machine: [0] ', 'default': '0'},
                     {'option': 'timelimit', 'info': 'mp_timelimit: [40] ', 'default': '40'},
                     {'option': 'winlimit', 'info': 'mp_winlimit: [0] ', 'default': '0'},
@@ -156,11 +156,11 @@ class GameServer(object):
                     {'option': 'tf_server_identity_account_id', 'info': 'tf_server_identity_account_id: [none]', 'default': 'ignore'},
                     {'option': 'tf_server_identity_token', 'info': 'tf_server_identity_token: [none]', 'default': 'ignore'},
                     {'option': 'mp_disable_respawn_times', 'info': 'mp_disable_respawn_times: [0]', 'default': '0', 'valid_option': ['0', '1']},
-                ])
+                ]
 
             # Counter-Strike: GO
             elif steam_appid == '740':
-                options.append([
+                options += [
                     {'option': 'gamemode', 'info': 'Gamemode: casual , competitive , armsrace , demolition , deathmatch , none : ', 'valid_option': ['casual', 'competitive', 'armsrace', 'demolition', 'deathmatch', 'none']},
                     {'option': 'mapgroup', 'info': 'Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none : ', 'valid_option': ['mg_op_op06', 'mg_op_op05', 'mg_op_breakout', 'mg_active', 'mg_reserves', 'mg_armsrace', 'mg_demolition', 'none']},
                     {'option': 'deadtalk', 'info': 'sv_deadtalk: [0] ', 'default': '0'},
@@ -177,28 +177,28 @@ class GameServer(object):
                     {'option': 'timelimit', 'info': 'mp_timelimit: [5] ', 'default': '5'},
                     {'option': 'buytime', 'info': 'mp_buytime: [90] ', 'default': '90'},
                     {'option': 'warmup_period', 'info': 'mp_do_warmup_period: [1] ', 'default': '1'},
-                ])
+                ]
 
             # Half-Life 2: deathmatch
             elif steam_appid == '232370':
-                options.append([
+                options += [
                     {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
                     {'option': 'timelimit', 'info': 'mp_timelimit: [30] ', 'default': '30'},
                     {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
-                ])
+                ]
 
             # Black Mesa
             elif steam_appid == '346680':
-                options.append([
+                options += [
                     {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
                     {'option': 'timelimit', 'info': 'mp_timelimit: [900] ', 'default': '900'},
                     {'option': 'warmup_time', 'info': 'mp_warmup_time: [30] ', 'default': '30'},
                     {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
-                ])
+                ]
 
             # Left4Dead2
             elif steam_appid == '222860':
-                options.append([
+                options += [
                     {'option': 'fork', 'info': 'How many server forks: [0] ', 'default': '0'},
                     {'option': 'mp_disable_autokick', 'info': 'mp_disable_autokick: [0] ', 'default': '0'},
                     {'option': 'sv_gametypes', 'info': 'sv_gametypes: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
@@ -206,7 +206,8 @@ class GameServer(object):
                     {'option': 'sv_unlag', 'info': 'sv_unlag: [1] ', 'default': '1'},
                     {'option': 'sv_maxunlag', 'info': 'sv_maxunlag: [.5] ', 'default': '.5'},
                     {'option': 'sv_steamgroup_exclusive', 'info': 'sv_steamgroup_exclusive: [0] ', 'default': '0'},
-                ])
+                ]
+
         else:
             print "Something went wrong. Your engine: '%s' is not supported. You should not even be reading this!" % engine
             print "Reconfigure the script and follow the prompts. Manual configuration is not a wise choice."
