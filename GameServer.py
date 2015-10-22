@@ -53,7 +53,7 @@ class GameServer(object):
         steamcmd_options = [
                 {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
                 {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
-                {'option': 'basepath', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
+                {'option': 'path', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
                 {'option': 'appid', 'info': 'Steam AppID: '},
                 {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
         ]
