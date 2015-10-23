@@ -427,8 +427,8 @@ class UnrealGameServer(GameServer):
         steam_appid = self.gsconfig['steamcmd']['appid']
         # Start Ark
         if steam_appid == '376030':
-            if self.gsconfig[steam_appid]['ServerPassword'] != 'ignore':
-                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['ServerPassowrd'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+            if self.gsconfig[steam_appid]['serverpassword'] != 'ignore':
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],ServerAdminPassowrd=self.gsconfig[steam_appid]['serveradminpassword'])
             else:
                 run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
 
