@@ -428,9 +428,9 @@ class UnrealGameServer(GameServer):
         # Start Ark
         if steam_appid == '376030':
             if self.gsconfig[steam_appid]['serverpassword'] != 'ignore':
-                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],ServerAdminPassowrd=self.gsconfig[steam_appid]['serveradminpassword'])
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={serverpassword}?ServerAdminPassword={serveradminpassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],serveradminpassword=self.gsconfig[steam_appid]['serveradminpassword'])
             else:
-                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={serveradminpassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],serveradminpassowrd=self.gsconfig[steam_appid]['serveradminpassword'])
 
 
         s = Screen(steam_appid, True)
