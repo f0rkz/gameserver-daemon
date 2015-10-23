@@ -278,7 +278,7 @@ class SRCDSGameServer(GameServer):
             }
 
     def start(self):
-        steam_appid = gameserver_settings['steamcmd']['appid']
+        steam_appid = self.gsconfig['steamcmd']['appid']
         # Catch CSGO gamemode and mapgroup, then start it up
         if steam_appid == '740':
             if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
@@ -346,7 +346,7 @@ class SRCDSGameServer(GameServer):
 
 
     def stop(self):
-        steam_appid = gameserver_settings['steamcmd']['appid']
+        steam_appid = self.gsconfig['steamcmd']['appid']
         if self.status():
             s = Screen(steam_appid)
             s.kill()
@@ -358,13 +358,13 @@ class SRCDSGameServer(GameServer):
     Method to check the server's status
     """
     def status(self):
-        steam_appid = gameserver_settings['steamcmd']['appid']
+        steam_appid = self.gsconfig['steamcmd']['appid']
         s = Screen(steam_appid)
         is_server_running = s.exists
         return is_server_running
 
     def create_runscript(self):
-        steam_appid = gameserver_settings['steamcmd']['appid']
+        steam_appid = self.gsconfig['steamcmd']['appid']
         with open(os.path.join('templates', 'runscript.txt'), "r") as file:
             x = file.read()
 
@@ -412,7 +412,7 @@ class UnrealGameServer(GameServer):
             }
 
     def start(self):
-        steam_appid = gameserver_settings['steamcmd']['appid']
+        steam_appid = self.gsconfig['steamcmd']['appid']
         # Start Ark
         if steam_appid == '376030':
             run_commands = '{gamedir}'
