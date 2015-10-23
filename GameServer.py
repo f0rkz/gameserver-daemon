@@ -103,7 +103,7 @@ class GameServer(object):
             # ARK: Survival Evolved
             if steam_appid == '376030':
                 options += [
-                    {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': ''},
+                    {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': 'ignore'},
                     {'option': 'ServerAdminPassword', 'info': 'Admin Password [reset_me]', 'default': 'reset_me'},
                 ]
 
@@ -427,7 +427,7 @@ class UnrealGameServer(GameServer):
         steam_appid = self.gsconfig['steamcmd']['appid']
         # Start Ark
         if steam_appid == '376030':
-            if self.gsconfig[steam_appid]['ServerPassword'] != '':
+            if self.gsconfig[steam_appid]['ServerPassword'] != 'ignore':
                 run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['ServerPassowrd'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
             else:
                 run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
