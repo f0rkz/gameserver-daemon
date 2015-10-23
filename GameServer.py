@@ -434,7 +434,7 @@ class UnrealGameServer(GameServer):
 
 
         s = Screen(steam_appid, True)
-        s.send_commands(srcds_run)
+        s.send_commands(run_commands)
 
     def stop(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
