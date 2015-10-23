@@ -364,24 +364,25 @@ class SRCDSGameServer(GameServer):
         return is_server_running
 
     def create_runscript(self):
-            with open(os.path.join('templates', 'runscript.txt'), "r") as file:
-                x = file.read()
+        steam_appid = gameserver_settings['steamcmd']['appid']
+        with open(os.path.join('templates', 'runscript.txt'), "r") as file:
+            x = file.read()
 
-                template = Template(x)
+            template = Template(x)
 
-                runscript_vars = {
-                                'steamlogin': self.gsconfig['steamcmd']['user'],
-                                'steampassword': self.gsconfig['steamcmd']['password'],
-                                'install_dir': os.path.join(self.path['gamedir'], ''),
-                                'appid': self.config['steamcmd']['appid']
-                }
+            runscript_vars = {
+                            'steamlogin': self.gsconfig['steamcmd']['user'],
+                            'steampassword': self.gsconfig['steamcmd']['password'],
+                            'install_dir': os.path.join(self.path['gamedir'], ''),
+                            'appid': steam_appid,
+            }
 
-                output = template.render(runscript_vars)
+            output = template.render(runscript_vars)
 
-                with open(os.path.join(self.path['steamcmd']['path'],'runscript.txt'), "wb") as outfile:
-                    outfile.write(output)
+            with open(os.path.join(self.path['steamcmd']['path'],'runscript.txt'), "wb") as outfile:
+                outfile.write(output)
 
-            print "runscript.txt created"
+        print "runscript.txt created"
 
     def create_servercfg(self):
         with open(os.path.join('templates', 'server.cfg'), "r") as file:
