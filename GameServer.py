@@ -313,7 +313,7 @@ class SRCDSGameServer(GameServer):
                 srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = "+tf_mm_servermode 2"
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=gsself.config[steam_appid]['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = ''
 
         # BMS
