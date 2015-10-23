@@ -307,24 +307,32 @@ class SRCDSGameServer(GameServer):
 
         ################################################################ALL OF THIS NEEDS A REWRITE!
 
-        elif self.config['gameserver']['name'] == 'tf':
+        elif steam_appid == '232250':
             # Catch mann versus machine
-            if self.config['tf']['mvm'] == '1':
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            if self.gsconfig[steam_appid]['mvm'] == '1':
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = "+tf_mm_servermode 2"
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=gsself.config[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = ''
 
-        elif self.config['gameserver']['name'] == 'bms':
+        # BMS
+        elif steam_appid == '346680':
             # Catch alrternative configuration file, then start it up
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
-        elif self.config['gameserver']['name'] == 'left4dead2':
+        # L4D2
+        elif steam_appid == '222860':
             srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], fork=self.config['l4d2']['fork'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
             extra_parameters = ''
 
+        # hl2mp
+        elif steam_appid == '232370':
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            extra_parameters = ''
+
+        # No game type or unsupported game type
         else:
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
