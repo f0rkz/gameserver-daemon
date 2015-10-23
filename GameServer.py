@@ -318,7 +318,7 @@ class SRCDSGameServer(GameServer):
 
         # BMS
         elif steam_appid == '346680':
-            # Catch alrternative configuration file, then start it up
+                # Catch alrternative configuration file, then start it up
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
@@ -337,7 +337,7 @@ class SRCDSGameServer(GameServer):
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
             extra_parameters = ''
 
-        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=self.path['gamedir']), launch=srcds_launch, extra=extra_parameters)
+        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=self.path['gamedir'], launch=srcds_launch, extra=extra_parameters)
 
         s = Screen(steam_appid, True)
         s.send_commands(srcds_run)
