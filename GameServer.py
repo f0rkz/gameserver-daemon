@@ -7,55 +7,118 @@ import tarfile
 from jinja2 import Template
 from screenutils import list_screens, Screen
 
-
-parser = ConfigParser.RawConfigParser()
+# Important constants within the class
 CONFIG_FILE = "server.conf"
+STEAMCMD_DOWNLOAD = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '232250': 'tf',
+    '740': 'csgo',
+    '232370': 'hl2mp',
+    '346680': 'bms',
+    '222860': 'left4dead2',
+    '376030': 'ShooterGame',
+}
+
+# Configuration parser variable. Don't touch this.
+parser = ConfigParser.RawConfigParser()
 
 class GameServer(object):
-    def __init__(self, gsconfig):
-        self.config = gsconfig
-        if self.config:
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
             self.path = {
-                'steamcmd': os.path.join(self.config['gameserver']['path'], ''),
-                'gamedir': os.path.join(self.config['gameserver']['path'], self.config['gameserver']['name']),
-                        }
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
+    """
+    Configuration method of the shared information between engines
+    """
     def configure(self):
-        print "Configuration has been selected."
+        """
+        Method used to loop through configuration lists and prompt the user
+        """
+        def configure_list(group, list):
+            for config_object in list:
+                while True:
+                    user_input = raw_input(config_object['info'])
+                    if user_input:
+                        if config_object.get('valid_option') and not user_input in config_object['valid_option']:
+                            print "Invalid option. Please chose one of the following: {}".format(config_object['valid_option'])
+                        else:
+                            group[config_object['option']] = user_input
+                            break
+                    if not config_object.get('default', None):
+                        pass #loop back and ask again
+                    else:
+                        group[config_object['option']] = config_object['default']   # Default value set!
+                        break
+                parser.set(group['id'], config_object['option'], group[config_object['option']])
 
         """
-        Configuration dictionaries template:
-        thing [
-            {'option': '', 'info': '', 'default': ''},
-        ]
-        
-        If you want to force a user to enter a value:
-        thing [
-            {'option': '', 'info': ''},
-        ]
-
-        If you need to validate based on a list of options:
-        thing [
-            {'option': '', 'info': '', 'valid_option': ['option1', 'option2', 'option3']},
-        ]
+        Host of steamcmd options and data about the game files
         """
-
-        # -----------------------------------------
-        # Steamcmd options for configuration
-        # -----------------------------------------
         steamcmd_options = [
                 {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
                 {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
-        ]
-
-        # -------------------------------------------------
-        # Base shared gameserver options for configuration
-        # -------------------------------------------------
-        gameserver_options = [
+                {'option': 'path', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
                 {'option': 'appid', 'info': 'Steam AppID: '},
-                {'option': 'path', 'info': 'Gameserver Install Path: '},
-                {'option': 'name', 'info': 'Gameserver name, ie: csgo: '},
-                {'option': 'daemon', 'info': 'Gameserver daemon: [srcds_run] ', 'default': 'srcds_run'},
+                {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
+        ]
+        """
+        Save the steam cmd configuration items
+        """
+        steamcmd = {'id': 'steamcmd'}
+        parser.add_section('steamcmd')
+        configure_list(steamcmd,steamcmd_options)
+
+        parser.write(open(CONFIG_FILE, 'w'))
+        print "Configuration file saved as {}".format(CONFIG_FILE)
+        # Base configuration is saved now. We can configure it with gameserver options
+
+        """
+        Load up the recently saved configuration so we can get basic information
+        about the game.
+        """
+        # Load up the configuration file so we can parse the appid
+        parser.read(CONFIG_FILE)
+        gameserver_settings = parser._sections
+        steam_appid = gameserver_settings['steamcmd']['appid']
+        engine = gameserver_settings['steamcmd']['engine']
+
+        """
+        Here be options
+        """
+        # Catch if the server is unreal or srcds. It matters.
+        if engine == 'unreal':
+            # Shared Unreal Options
+            options = [
+                {'option': 'ip', 'info': 'Gameserver IP: [0.0.0.0] ', 'default': '0.0.0.0'},
+                {'option': 'hostname', 'info': 'Gameserver Hostname: [My Gameserver] ', 'default': 'My Gameserver'},
+            ]
+
+            # ARK: Survival Evolved
+            if steam_appid == '376030':
+                options += [
+                    {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': 'ignore'},
+                    {'option': 'ServerAdminPassword', 'info': 'Admin Password [reset_me]', 'default': 'reset_me'},
+                ]
+
+            # Killing Floor 1
+            elif steam_appid == '215360':
+                pass
+
+            # Killing Floor 2 (lol just kidding.)
+            # Probably need to update this whenever KF2 gets linux support
+            elif steam_appid == '232130':
+                pass
+
+        elif engine == 'srcds':
+            # Shared SRCDS Options
+            options = [
                 {'option': 'hostname', 'info': 'Gameserver hostname: [My Gameserver] ', 'default': 'My Gameserver'},
                 {'option': 'ip', 'info': 'Gameserver IP: [0.0.0.0] ', 'default': '0.0.0.0'},
                 {'option': 'port', 'info': 'Gameserver port: [27015] ', 'default': '27015'},
@@ -89,250 +152,141 @@ class GameServer(object):
                 {'option': 'pure_trace', 'info': 'sv_pure_trace: [0] ', 'default': '0'},
                 {'option': 'motd', 'info': 'MOTD URL: [] ', 'default': 'ignore'},
                 {'option': 'sv_setsteamaccount', 'info': 'sv_setsteamaccount: [] ', 'default': 'ignore'},
-        ]
+            ]
 
-        # ------------------------
-        # CSGO gameserver options
-        # ------------------------
-        csgo_options = [
-                {'option': 'gamemode', 'info': 'Gamemode: casual , competitive , armsrace , demolition , deathmatch , none : ', 'valid_option': ['casual', 'competitive', 'armsrace', 'demolition', 'deathmatch', 'none']},
-                {'option': 'mapgroup', 'info': 'Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none : ', 'valid_option': ['mg_op_op06', 'mg_op_op05', 'mg_op_breakout', 'mg_active', 'mg_reserves', 'mg_armsrace', 'mg_demolition', 'none']},
-                {'option': 'deadtalk', 'info': 'sv_deadtalk: [0] ', 'default': '0'},
-                {'option': 'full_alltalk', 'info': 'sv_full_alltalk: [0] ', 'default': '0'},
-                {'option': 'pausable', 'info': 'sv_pausable: [0] ', 'default': '0'},
-                {'option': 'limitteams', 'info': 'mp_limitteams: [1] ', 'default': '1'},
-                {'option': 'friendlyfire', 'info': 'mp_friendlyfire: [0] ', 'default': '0'},
-                {'option': 'teambalance', 'info': 'mp_autoteambalance: [1] ', 'default': '1'},
-                {'option': 'autokick', 'info': 'mp_autokick: [1] ', 'default': '1'},
-                {'option': 'tkpunish', 'info': 'mp_tkpunish: [1] ', 'default': '1'},
-                {'option': 'freezetime', 'info': 'mp_freezetime: [6] ', 'default': '6'},
-                {'option': 'maxrounds', 'info': 'mp_maxrounds: [0] ', 'default': '0'},
-                {'option': 'roundtime', 'info': 'mp_roundtime: [5] ', 'default': '5'},
-                {'option': 'timelimit', 'info': 'mp_timelimit: [5] ', 'default': '5'},
-                {'option': 'buytime', 'info': 'mp_buytime: [90] ', 'default': '90'},
-                {'option': 'warmup_period', 'info': 'mp_do_warmup_period: [1] ', 'default': '1'},
-        ]
+            # Team Fotress 2
+            if steam_appid == '232250':
+                # Configuration options for TF2
+                options += [
+                    {'option': 'mvm', 'info': 'Mann Versus Machine: [0] ', 'default': '0'},
+                    {'option': 'timelimit', 'info': 'mp_timelimit: [40] ', 'default': '40'},
+                    {'option': 'winlimit', 'info': 'mp_winlimit: [0] ', 'default': '0'},
+                    {'option': 'overtime_nag', 'info': 'tf_overtime_nag: [0] ', 'default': '0'},
+                    {'option': 'tf_mm_servermode', 'info': 'tf_mm_servermode [1] ', 'default': '1', 'valid_option': ['0', '1', '2']},
+                    {'option': 'tf_server_identity_account_id', 'info': 'tf_server_identity_account_id: [none]', 'default': 'ignore'},
+                    {'option': 'tf_server_identity_token', 'info': 'tf_server_identity_token: [none]', 'default': 'ignore'},
+                    {'option': 'mp_disable_respawn_times', 'info': 'mp_disable_respawn_times: [0]', 'default': '0', 'valid_option': ['0', '1']},
+                ]
 
-        # ------------------------------------
-        # Black Mesa (bms) gameserver options
-        # ------------------------------------
-        bms_options = [
-                {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
-                {'option': 'timelimit', 'info': 'mp_timelimit: [900] ', 'default': '900'},
-                {'option': 'warmup_time', 'info': 'mp_warmup_time: [30] ', 'default': '30'},
-                {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
-        ]
+            # Counter-Strike: GO
+            elif steam_appid == '740':
+                options += [
+                    {'option': 'gamemode', 'info': 'Gamemode: casual , competitive , armsrace , demolition , deathmatch , none : ', 'valid_option': ['casual', 'competitive', 'armsrace', 'demolition', 'deathmatch', 'none']},
+                    {'option': 'mapgroup', 'info': 'Mapgroup: mg_op_op06 , mg_op_op05 , mg_op_breakout , mg_active , mg_reserves , mg_armsrace , mg_demolition , none : ', 'valid_option': ['mg_op_op06', 'mg_op_op05', 'mg_op_breakout', 'mg_active', 'mg_reserves', 'mg_armsrace', 'mg_demolition', 'none']},
+                    {'option': 'deadtalk', 'info': 'sv_deadtalk: [0] ', 'default': '0'},
+                    {'option': 'full_alltalk', 'info': 'sv_full_alltalk: [0] ', 'default': '0'},
+                    {'option': 'pausable', 'info': 'sv_pausable: [0] ', 'default': '0'},
+                    {'option': 'limitteams', 'info': 'mp_limitteams: [1] ', 'default': '1'},
+                    {'option': 'friendlyfire', 'info': 'mp_friendlyfire: [0] ', 'default': '0'},
+                    {'option': 'teambalance', 'info': 'mp_autoteambalance: [1] ', 'default': '1'},
+                    {'option': 'autokick', 'info': 'mp_autokick: [1] ', 'default': '1'},
+                    {'option': 'tkpunish', 'info': 'mp_tkpunish: [1] ', 'default': '1'},
+                    {'option': 'freezetime', 'info': 'mp_freezetime: [6] ', 'default': '6'},
+                    {'option': 'maxrounds', 'info': 'mp_maxrounds: [0] ', 'default': '0'},
+                    {'option': 'roundtime', 'info': 'mp_roundtime: [5] ', 'default': '5'},
+                    {'option': 'timelimit', 'info': 'mp_timelimit: [5] ', 'default': '5'},
+                    {'option': 'buytime', 'info': 'mp_buytime: [90] ', 'default': '90'},
+                    {'option': 'warmup_period', 'info': 'mp_do_warmup_period: [1] ', 'default': '1'},
+                ]
 
-        # ----------------------------
-        # TF2 (tf) gameserver options
-        # ----------------------------
-        tf_options = [
-                {'option': 'mvm', 'info': 'Mann Versus Machine: [0] ', 'default': '0'},
-                {'option': 'timelimit', 'info': 'mp_timelimit: [40] ', 'default': '40'},
-                {'option': 'winlimit', 'info': 'mp_winlimit: [0] ', 'default': '0'},
-                {'option': 'overtime_nag', 'info': 'tf_overtime_nag: [0] ', 'default': '0'},
-                {'option': 'tf_mm_servermode', 'info': 'tf_mm_servermode [1] ', 'default': '1', 'valid_option': ['0', '1', '2']},
-                {'option': 'tf_server_identity_account_id', 'info': 'tf_server_identity_account_id: [none]', 'default': 'ignore'},
-                {'option': 'tf_server_identity_token', 'info': 'tf_server_identity_token: [none]', 'default': 'ignore'}, 
-                {'option': 'mp_disable_respawn_times', 'info': 'mp_disable_respawn_times: [0]', 'default': '0', 'valid_option': ['0', '1']},
-        ]
+            # Half-Life 2: deathmatch
+            elif steam_appid == '232370':
+                options += [
+                    {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
+                    {'option': 'timelimit', 'info': 'mp_timelimit: [30] ', 'default': '30'},
+                    {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
+                ]
 
-        # ---------------------------------
-        # hl2dm (hl2mp) gameserver options
-        # ---------------------------------
+            # Black Mesa
+            elif steam_appid == '346680':
+                options += [
+                    {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
+                    {'option': 'timelimit', 'info': 'mp_timelimit: [900] ', 'default': '900'},
+                    {'option': 'warmup_time', 'info': 'mp_warmup_time: [30] ', 'default': '30'},
+                    {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
+                ]
 
-        hl2mp_options = [
-                {'option': 'fraglimit', 'info': 'mp_fraglimit: [50] ', 'default': '50'},
-                {'option': 'timelimit', 'info': 'mp_timelimit: [30] ', 'default': '30'},
-                {'option': 'teamplay', 'info': 'mp_teamplay: [0] ', 'default': '0'},
-        ]
-
-        # -----------------------------------------
-        # Left 4 Dead 2 (l4d2) gameserver options
-        # -----------------------------------------
-
-        l4d2_options = [
-                {'option': 'fork', 'info': 'How many server forks: [0] ', 'default': '0'},
-                {'option': 'mp_disable_autokick', 'info': 'mp_disable_autokick: [0] ', 'default': '0'},
-                {'option': 'sv_gametypes', 'info': 'sv_gametypes: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
-                {'option': 'mp_gamemode', 'info': 'sv_gamemode: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
-                {'option': 'sv_unlag', 'info': 'sv_unlag: [1] ', 'default': '1'},
-                {'option': 'sv_maxunlag', 'info': 'sv_maxunlag: [.5] ', 'default': '.5'},
-                {'option': 'sv_steamgroup_exclusive', 'info': 'sv_steamgroup_exclusive: [0] ', 'default': '0'},
-
-        ]
-
-        # Method to take each options list above and process it. No more redundant loops!
-
-        def configure_list(group, list):
-            for config_object in list:
-                while True:
-                    user_input = raw_input(config_object['info'])
-                    if user_input:
-                        if config_object.get('valid_option') and not user_input in config_object['valid_option']:
-                            print "Invalid option. Please chose one of the following: {}".format(config_object['valid_option'])
-                        else:
-                            group[config_object['option']] = user_input
-                            break
-                    if not config_object.get('default', None):
-                        pass #loop back and ask again
-                    else:
-                        group[config_object['option']] = config_object['default']   # Default value set!
-                        break
-                parser.set(group['id'], config_object['option'], group[config_object['option']])
-
-        # Base steamcmd login info
-
-        steamcmd = {'id': 'steamcmd'}
-        parser.add_section('steamcmd')
-        configure_list(steamcmd,steamcmd_options)
-
-        # Base gameserver information (common cvars)
-
-        gameserver = {'id': 'gameserver'}
-        parser.add_section('gameserver')
-        configure_list(gameserver,gameserver_options)
-
-        # Each game that is supported here
-
-        if gameserver['name'] == 'csgo':
-            csgo = {'id': 'csgo'}
-            parser.add_section('csgo')
-            configure_list(csgo,csgo_options)
-
-        elif gameserver['name'] == 'hl2mp':
-            hl2mp = {'id': 'hl2mp'}
-            parser.add_section('hl2mp')
-            configure_list(hl2mp,hl2mp_options)
-
-        elif gameserver['name'] == 'tf':
-            tf = {'id': 'tf'}
-            parser.add_section('tf')
-            configure_list(tf,tf_options)
-
-        elif gameserver['name'] == 'bms':
-            bms = {'id': 'bms'}
-            parser.add_section('bms')
-            configure_list(bms,bms_options)
-
-        elif gameserver['name'] == 'left4dead2':
-            l4d2 = {'id': 'l4d2'}
-            parser.add_section('l4d2')
-            configure_list(l4d2,l4d2_options)
+            # Left4Dead2
+            elif steam_appid == '222860':
+                options += [
+                    {'option': 'fork', 'info': 'How many server forks: [0] ', 'default': '0'},
+                    {'option': 'mp_disable_autokick', 'info': 'mp_disable_autokick: [0] ', 'default': '0'},
+                    {'option': 'sv_gametypes', 'info': 'sv_gametypes: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
+                    {'option': 'mp_gamemode', 'info': 'sv_gamemode: [coop,realism,survival,versus,teamversus,scavenge,teamscavenge] ', 'default': 'coop,realism,survival,versus,teamversus,scavenge,teamscavenge'},
+                    {'option': 'sv_unlag', 'info': 'sv_unlag: [1] ', 'default': '1'},
+                    {'option': 'sv_maxunlag', 'info': 'sv_maxunlag: [.5] ', 'default': '.5'},
+                    {'option': 'sv_steamgroup_exclusive', 'info': 'sv_steamgroup_exclusive: [0] ', 'default': '0'},
+                ]
 
         else:
-            # Let the user know gameserver is not supported. This could be a user error or an actual game not supported.
+            print "Something went wrong. Your engine: '%s' is not supported. You should not even be reading this!" % engine
+            print "Reconfigure the script and follow the prompts. Manual configuration is not a wise choice."
+            exit()
 
-            print "Gameserver name {} not supported by this script. Base configuration options will be used.".format(gameserver['name'])
+        # Run through the config options, you filthy animal
+        game = {'id': steam_appid}
+        parser.add_section(steam_appid)
+        configure_list(game,options)
 
         # Write the configuration file
         parser.write(open(CONFIG_FILE, 'w'))
         print "Configuration file saved as {}".format(CONFIG_FILE)
 
+
+    """
+    Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
+    link changes. STEAMCMD_DOWNLOAD can be found at the top of this class file.
+    """
     def install_steamcmd(self):
-        INSTALL_DIR = os.path.dirname(self.config['gameserver']['path'])
-        STEAMCMD_DOWNLOAD = "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+        if self.gsconfig:
+            while True:
+                if os.path.exists(self.path['steamcmd']):
+                    INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
+                    #Download steamcmd and extract it
+                    urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
+                    steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
+                    steamcmd_tar.extractall(INSTALL_DIR)
+                    break
+                else:
+                    # Create the directory
+                    os.makedirs(self.path['steamcmd'])
+        else:
+            print "Error: No configuration file found. Please run with the --configure option"
 
-        #Download steamcmd and extract it
-        urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
-        steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
-        steamcmd_tar.extractall(INSTALL_DIR)
-
+    """
+    Method to update game files with the validate option
+    """
     def update_game_validate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
         subprocess.call(steamcmd_run, shell=True)
 
+    """
+    Method to update game files without the validate option
+    """
     def update_game_novalidate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.config['steamcmd']['user'], password=self.config['steamcmd']['password'], installdir=self.path['gamedir'], id=self.config['gameserver']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
         subprocess.call(steamcmd_run, shell=True)
 
-    def create_runscript(self):
-        with open(os.path.join('templates', 'runscript.txt'), "r") as file:
-            x = file.read()
-
-            template = Template(x)
-
-            runscript_vars = {
-                            'steamlogin': self.config['steamcmd']['user'],
-                            'steampassword': self.config['steamcmd']['password'],
-                            'install_dir': os.path.join(self.config['gameserver']['path'], self.config['gameserver']['name']),
-                            'appid': self.config['gameserver']['appid']
+class SRCDSGameServer(GameServer):
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid'])
             }
-
-            output = template.render(runscript_vars)
-
-            with open(os.path.join(self.config['gameserver']['path'],'runscript.txt'), "wb") as outfile:
-                outfile.write(output)
-
-        print "runscript.txt created"
-
-
-    def create_servercfg(self):
-        with open(os.path.join('templates', 'server.cfg'), "r") as file:
-            x = file.read()
-            template = Template(x)
-
-            srcds_vars = self.config['gameserver']
-
-            if srcds_vars['name'] == 'csgo':
-                srcds_vars.update(self.config['csgo'])
-            
-            elif srcds_vars['name'] == 'bms':
-                srcds_vars.update(self.config['bms'])
-
-            elif srcds_vars['name'] == 'tf':
-                srcds_vars.update(self.config['tf'])
-
-            elif srcds_vars['name'] == 'hl2mp':
-                srcds_vars.update(self.config['hl2mp'])
-
-            elif srcds_vars['name'] == 'left4dead2':
-                srcds_vars.update(self.config['l4d2'])
-
-            output = template.render(srcds_vars)
-
-            if srcds_vars['name'] == 'bms':
-                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','servercustom.cfg'), "wb") as outfile:
-                    outfile.write(output)
-            else:
-                with open(os.path.join(srcds_vars['path'],srcds_vars['name'],srcds_vars['name'],'cfg','server.cfg'), "wb") as outfile:
-                    outfile.write(output)
-        print "server.cfg saved"
-
-    def create_motd(self):
-        with open(os.path.join('templates', 'motd.txt'), "r") as file:
-            x = file.read()
-
-            template = Template(x)
-
-            motd_vars = {
-                        'motd': self.config['gameserver']['motd'],
-            }
-
-            output = template.render(motd_vars)
-
-            with open(os.path.join(self.config['gameserver']['path'],self.config['gameserver']['name'],self.config['gameserver']['name'],'motd.txt'), "wb") as outfile:
-                outfile.write(output)
-        print "motd.txt saved"
-
-    def status(self):
-        s = Screen(self.config['gameserver']['name'])
-        is_server_running = s.exists
-        return is_server_running
 
     def start(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         # Catch CSGO gamemode and mapgroup, then start it up
-        if self.config['gameserver']['name'] == 'csgo':
-            if not self.config['csgo']['mapgroup'] == 'none':
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], mapgroup=self.config['csgo']['mapgroup'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
-            
+        if steam_appid == '740':
+            if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], tickrate=self.gsconfig[steam_appid]['tickrate'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], mapgroup=self.gsconfig[steam_appid]['mapgroup'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], tickrate=self.config['gameserver']['tickrate'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
-            
-            if not self.config['csgo']['gamemode'] == 'none':
-                
-                gamemode = self.config['csgo']['gamemode']
-                
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], tickrate=self.gsconfig[steam_appid]['tickrate'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+            if not self.gsconfig[steam_appid]['gamemode'] == 'none':
+                gamemode = self.config[steam_appid]['gamemode']
+
                 if gamemode == 'casual':
                     extra_parameters = "+game_type 0 +game_mode 0"
 
@@ -349,39 +303,153 @@ class GameServer(object):
                     extra_parameters = "+game_type 1 +game_mode 2"
             else:
                 gamemode_launch = ''
-            
-            
-        elif self.config['gameserver']['name'] == 'tf':
+
+        elif steam_appid == '232250':
             # Catch mann versus machine
-            if self.config['tf']['mvm'] == '1':
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            if self.gsconfig[steam_appid]['mvm'] == '1':
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = "+tf_mm_servermode 2"
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
                 extra_parameters = ''
-            
-        elif self.config['gameserver']['name'] == 'bms':
-            # Catch alrternative configuration file, then start it up
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+
+        # BMS
+        elif steam_appid == '346680':
+                # Catch alrternative configuration file, then start it up
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
             extra_parameters = ''
 
-        elif self.config['gameserver']['name'] == 'left4dead2':
-            srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=self.config['gameserver']['name'], fork=self.config['l4d2']['fork'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'])
+        # L4D2
+        elif steam_appid == '222860':
+            srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=GAME[steam_appid], fork=self.gsconfig[steam_appid]['fork'], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'])
             extra_parameters = ''
 
+        # hl2mp
+        elif steam_appid == '232370':
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+            extra_parameters = ''
+
+        # No game type or unsupported game type
         else:
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=self.config['gameserver']['name'], steam_dir=self.config['gameserver']['path'], runscript='runscript.txt', maxplayers=self.config['gameserver']['maxplayers'], port=self.config['gameserver']['port'], ip=self.config['gameserver']['ip'], map=self.config['gameserver']['map'], steamaccount=self.config['gameserver']['sv_setsteamaccount'])
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.config[steam_appid]['port'], ip=self.config[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
             extra_parameters = ''
 
-        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=os.path.join(self.config['gameserver']['path'],self.config['gameserver']['name']), launch=srcds_launch, extra=extra_parameters)
+        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=self.path['gamedir'], launch=srcds_launch, extra=extra_parameters)
 
-        s = Screen(self.config['gameserver']['name'], True)
+        s = Screen(steam_appid, True)
         s.send_commands(srcds_run)
 
     def stop(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         if self.status():
-            s = Screen(self.config['gameserver']['name'])
+            s = Screen(steam_appid)
             s.kill()
             print "Server stopped."
         else:
            print "Server is not running."
+
+    """
+    Method to check the server's status
+    """
+    def status(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        s = Screen(steam_appid)
+        is_server_running = s.exists
+        return is_server_running
+
+    def create_runscript(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        with open(os.path.join('templates', 'runscript.txt'), "r") as file:
+            x = file.read()
+
+            template = Template(x)
+
+            runscript_vars = {
+                            'steamlogin': self.gsconfig['steamcmd']['user'],
+                            'steampassword': self.gsconfig['steamcmd']['password'],
+                            'install_dir': os.path.join(self.path['gamedir'], ''),
+                            'appid': steam_appid,
+            }
+
+            output = template.render(runscript_vars)
+
+            with open(os.path.join(self.path['steamcmd'],'runscript.txt'), "wb") as outfile:
+                outfile.write(output)
+
+        print "runscript.txt created"
+
+    def create_motd(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        with open(os.path.join('templates', 'motd.txt'), "r") as file:
+            x = file.read()
+
+            template = Template(x)
+
+            motd_vars = {
+                        'motd': self.gsconfig[steam_appid]['motd'],
+            }
+
+            output = template.render(motd_vars)
+
+            with open(os.path.join(self.path['gamedir'],GAME[steam_appid],'motd.txt'), "wb") as outfile:
+                outfile.write(output)
+        print "motd.txt saved"
+
+    def create_servercfg(self):
+        with open(os.path.join('templates', 'server.cfg'), "r") as file:
+            x = file.read()
+            template = Template(x)
+
+            appid = self.gsconfig['steamcmd']['appid']
+            srcds_vars = self.gsconfig[appid]
+
+            output = template.render(srcds_vars)
+
+            if appid == '346680':
+                with open(os.path.join(self.path['gamedir'],GAME[appid],'cfg','servercustom.cfg'), "wb") as outfile:
+                    outfile.write(output)
+            else:
+                with open(os.path.join(self.path['gamedir'],GAME[appid],'cfg','server.cfg'), "wb") as outfile:
+                    outfile.write(output)
+        print "server.cfg saved"
+
+class UnrealGameServer(GameServer):
+    def __init__(self,gsconfig):
+        self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
+
+    def start(self):
+    #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        # Start Ark
+        if steam_appid == '376030':
+            if self.gsconfig[steam_appid]['ServerPassword'] != 'ignore':
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['ServerPassowrd'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+            else:
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+
+
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
+
+    def stop(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.status():
+            s = Screen(steam_appid)
+            s.kill()
+            print "Server stopped."
+        else:
+           print "Server is not running."
+
+    """
+    Method to check the server's status
+    """
+    def status(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        s = Screen(steam_appid)
+        is_server_running = s.exists
+        return is_server_running
