@@ -379,6 +379,23 @@ class SRCDSGameServer(GameServer):
 
         print "runscript.txt created"
 
+    def create_motd(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        with open(os.path.join('templates', 'motd.txt'), "r") as file:
+            x = file.read()
+
+            template = Template(x)
+
+            motd_vars = {
+                        'motd': self.gsconfig[steam_appid]['motd'],
+            }
+
+            output = template.render(motd_vars)
+
+            with open(os.path.join(self.path['gamedir'],GAME[steam_appid],'motd.txt'), "wb") as outfile:
+                outfile.write(output)
+        print "motd.txt saved"
+
     def create_servercfg(self):
         with open(os.path.join('templates', 'server.cfg'), "r") as file:
             x = file.read()
