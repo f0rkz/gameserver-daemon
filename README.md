@@ -18,15 +18,15 @@ everything in between.
 
 `sudo apt-get install lib32gcc1`
 
+* For other distributions, find the proper lib32gcc1 package and install it.
+
 - Step 3: Install the python-pip package
 
 `sudo apt-get install python-pip`
 
-- Step 4: Create the gameserver base directory
+* For other distributions, find the proper python-pip package and install it.
 
-`mkdir /home/steam/mygame.hostname.com`
-
-- Step 5: Install the python prerequisites
+- Step 4: Install the python prerequisites
 
 `sudo pip install -r requirements.txt`
 
@@ -41,18 +41,20 @@ To view the various arguments gameserver-daemon.py has, run the following:
 ## --configure
 To configure your gameserver for the first time, you will need to add the `--configure` argument to the script.
 
+You will need to know the appid for your game.
+
 `python gameserver-daemon.py --configure`
 
 This will build a ini-like configuration file called `server.conf` in the script's directory.
 
-There are a select group of games currently supported by the script. For the `Gameserver Name` configuration prompt
-choose from the following:
+There are a select group of games currently supported by the script.
 
-- csgo
-- tf
-- hl2mp
-- bms
-- left4dead2
+- csgo: APPID 740
+- tf2: APPID 232250
+- hl2mp: APPID 232370
+- bms: APPID 346680
+- left4dead2: APPID 222860
+- ARK Survival Evolved: APPID 376030
 
 More games are planned for the future. To properly set your server up, use one of the above (for the game you are planning on running.)
 
@@ -64,6 +66,8 @@ Assuming you already configured your server, the `-u` or `--update` argument wil
 
 ## --validate
 See: `--update`
+
+# SRCDS Specific Options
 
 ## --runscript
 Generate the runscript.txt file used to update the gameserver at launch. Required for headless launch.
@@ -81,7 +85,7 @@ Generate the motd.txt set in `--configure`. This is a URL IE: http://www.mygamin
 # Example usage
 ## Initial install
 
-`python gameserver-daemon.py --configure --steamcmd --update --validate`
+`python gameserver-daemon.py --configure --update --validate`
 
 This will configure the gameserver, install steamcmd, install the gameserver files with the validate option.
 
