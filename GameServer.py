@@ -379,7 +379,7 @@ class SRCDSGameServer(GameServer):
 
             output = template.render(runscript_vars)
 
-            with open(os.path.join(self.path['steamcmd']['path'],'runscript.txt'), "wb") as outfile:
+            with open(os.path.join(self.path['steamcmd'],'runscript.txt'), "wb") as outfile:
                 outfile.write(output)
 
         print "runscript.txt created"
