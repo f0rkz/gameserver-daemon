@@ -102,7 +102,6 @@ class GameServer(object):
 
             # ARK: Survival Evolved
             if steam_appid == '376030':
-                #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
                 options += [
                     {'option': 'ServerPassword', 'info': 'Private Server Password: [none]', 'default': ''},
                     {'option': 'ServerAdminPassword', 'info': 'Admin Password [reset_me]', 'default': 'reset_me'},
@@ -424,18 +423,33 @@ class UnrealGameServer(GameServer):
             }
 
     def start(self):
+    #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
         steam_appid = self.gsconfig['steamcmd']['appid']
         # Start Ark
         if steam_appid == '376030':
-            run_commands = '{gamedir}'
+            if self.gsconfig[steam_appid]['ServerPassword'] != '':
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={ServerPassowrd}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['ServerPassowrd'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+            else:
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={ServerAdminPassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerAdminPassowrd=self.gsconfig[steam_appid]['ServerAdminPassowrd'])
+
 
         s = Screen(steam_appid, True)
         s.send_commands(srcds_run)
 
     def stop(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         if self.status():
-            s = Screen(self.config['gameserver']['name'])
+            s = Screen(steam_appid)
             s.kill()
             print "Server stopped."
         else:
            print "Server is not running."
+
+    """
+    Method to check the server's status
+    """
+    def status(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        s = Screen(steam_appid)
+        is_server_running = s.exists
+        return is_server_running

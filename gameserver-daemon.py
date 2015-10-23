@@ -5,6 +5,7 @@ import argparse
 import subprocess
 from GameServer import GameServer
 from GameServer import SRCDSGameServer
+from GameServer import UnrealGameServer
 
 
 CONFIG_FILE = "server.conf"
@@ -126,4 +127,24 @@ if os.path.isfile(CONFIG_FILE):
             myserver.start()
 
     if engine == "unreal":
-        pass
+        if args.start:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = UnrealGameServer(gsconfig=gameserver)
+            if myserver.status():
+                sys.exit("Server is running. Please stop or restart your server.")
+            else:
+                myserver.start()
+
+        if args.stop:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = UnrealGameServer(gsconfig=gameserver)
+            myserver.stop()
+
+        if args.restart:
+            #parser.read(CONFIG_FILE)
+            #gameserver = parser._sections
+            myserver = UnrealGameServer(gsconfig=gameserver)
+            myserver.stop()
+            myserver.start()
