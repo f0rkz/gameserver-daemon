@@ -257,14 +257,28 @@ class GameServer(object):
     Method to update game files with the validate option
     """
     def update_game_validate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} validate +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
+                       ' +force_install_dir {installdir} +app_update {id} validate +quit' \
+                       .format(steamcmdpath=self.path['steamcmd'],
+                               login=self.gsconfig['steamcmd']['user'],
+                               password=self.gsconfig['steamcmd']['password'],
+                               installdir=self.path['gamedir'],
+                               id=self.gsconfig['steamcmd']['appid']
+                              )
         subprocess.call(steamcmd_run, shell=True)
 
     """
     Method to update game files without the validate option
     """
     def update_game_novalidate(self):
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password} +force_install_dir {installdir} +app_update {id} +quit'.format(steamcmdpath=self.path['steamcmd'], login=self.gsconfig['steamcmd']['user'], password=self.gsconfig['steamcmd']['password'], installdir=self.path['gamedir'], id=self.gsconfig['steamcmd']['appid'])
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
+                       ' +force_install_dir {installdir} +app_update {id} +quit' \
+                       .format(steamcmdpath=self.path['steamcmd'],
+                               login=self.gsconfig['steamcmd']['user'],
+                               password=self.gsconfig['steamcmd']['password'],
+                               installdir=self.path['gamedir'],
+                               id=self.gsconfig['steamcmd']['appid']
+                              )
         subprocess.call(steamcmd_run, shell=True)
 
 class SRCDSGameServer(GameServer):
@@ -281,9 +295,34 @@ class SRCDSGameServer(GameServer):
         # Catch CSGO gamemode and mapgroup, then start it up
         if steam_appid == '740':
             if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], tickrate=self.gsconfig[steam_appid]['tickrate'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], mapgroup=self.gsconfig[steam_appid]['mapgroup'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} '\
+                               '-tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}' \
+                               .format(game=GAME[steam_appid],
+                                       steam_dir=self.path['steamcmd'],
+                                       runscript='runscript.txt',
+                                       maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                       tickrate=self.gsconfig[steam_appid]['tickrate'],
+                                       port=self.gsconfig[steam_appid]['port'],
+                                       ip=self.gsconfig[steam_appid]['ip'],
+                                       map=self.gsconfig[steam_appid]['map'],
+                                       mapgroup=self.gsconfig[steam_appid]['mapgroup'],
+                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                      )
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} -tickrate {tickrate} +port {port} +ip {ip} +map {map}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], tickrate=self.gsconfig[steam_appid]['tickrate'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
+                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} ' \
+                               '-tickrate {tickrate} +port {port} +ip {ip} +map {map}' \
+                               .format(game=GAME[steam_appid],
+                                       steam_dir=self.path['steamcmd'],
+                                       runscript='runscript.txt',
+                                       maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                       tickrate=self.gsconfig[steam_appid]['tickrate'],
+                                       port=self.gsconfig[steam_appid]['port'],
+                                       ip=self.gsconfig[steam_appid]['ip'],
+                                       map=self.gsconfig[steam_appid]['map'],
+                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                      )
             if not self.gsconfig[steam_appid]['gamemode'] == 'none':
                 gamemode = self.config[steam_appid]['gamemode']
 
@@ -307,34 +346,103 @@ class SRCDSGameServer(GameServer):
         elif steam_appid == '232250':
             # Catch mann versus machine
             if self.gsconfig[steam_appid]['mvm'] == '1':
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 '\
+                               '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                               .format(game=GAME[steam_appid],
+                                       steam_dir=self.path['steamcmd'],
+                                       runscript='runscript.txt',
+                                       port=self.gsconfig[steam_appid]['port'],
+                                       ip=self.gsconfig[steam_appid]['ip'],
+                                       map=self.gsconfig[steam_appid]['map'],
+                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                      )
                 extra_parameters = "+tf_mm_servermode 2"
             else:
-                srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+                srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} '\
+                               '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                               .format(game=GAME[steam_appid],
+                                       steam_dir=self.path['steamcmd'],
+                                       runscript='runscript.txt',
+                                       maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                       port=self.gsconfig[steam_appid]['port'],
+                                       ip=self.gsconfig[steam_appid]['ip'],
+                                       map=self.gsconfig[steam_appid]['map'],
+                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                      )
                 extra_parameters = ''
 
         # BMS
         elif steam_appid == '346680':
-                # Catch alrternative configuration file, then start it up
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+            # Catch alrternative configuration file, then start it up
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
+                           '+port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
             extra_parameters = ''
 
         # L4D2
         elif steam_appid == '222860':
-            srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map}'.format(game=GAME[steam_appid], fork=self.gsconfig[steam_appid]['fork'], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'])
+            srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
+                           '+port {port} +ip {ip} +map {map}' \
+                           .format(game=GAME[steam_appid],
+                                   fork=self.gsconfig[steam_appid]['fork'],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map']
+                                  )
             extra_parameters = ''
 
         # hl2mp
         elif steam_appid == '232370':
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.gsconfig[steam_appid]['port'], ip=self.gsconfig[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
+                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
             extra_parameters = ''
 
         # No game type or unsupported game type
         else:
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate -steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} +port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}'.format(game=GAME[steam_appid], steam_dir=self.path['steamcmd'], runscript='runscript.txt', maxplayers=self.gsconfig[steam_appid]['maxplayers'], port=self.config[steam_appid]['port'], ip=self.config[steam_appid]['ip'], map=self.gsconfig[steam_appid]['map'], steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'])
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
+                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.config[steam_appid]['port'],
+                                   ip=self.config[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
             extra_parameters = ''
 
-        srcds_run = '{path}/srcds_run {launch} {extra}'.format(path=self.path['gamedir'], launch=srcds_launch, extra=extra_parameters)
+        srcds_run = '{path}/srcds_run {launch} {extra}' \
+                    .format(path=self.path['gamedir'],
+                            launch=srcds_launch,
+                            extra=extra_parameters
+                           )
 
         s = Screen(steam_appid, True)
         s.send_commands(srcds_run)
@@ -428,13 +536,23 @@ class UnrealGameServer(GameServer):
         # Start Ark
         if steam_appid == '376030':
             if self.gsconfig[steam_appid]['serverpassword'] != 'ignore':
-                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerPassword={serverpassword}?ServerAdminPassword={serveradminpassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],serveradminpassword=self.gsconfig[steam_appid]['serveradminpassword'])
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer ' \
+                               'TheIsland?Listen?SessionName={hostname}?ServerPassword={serverpassword}' \
+                               '?ServerAdminPassword={serveradminpassowrd}' \
+                               .format(gamedir=self.path['gamedir'],
+                                       hostname=self.gsconfig[steam_appid]['hostname'],
+                                       ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],
+                                       serveradminpassword=self.gsconfig[steam_appid]['serveradminpassword']
+                                      )
             else:
-                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={serveradminpassowrd}'.format(gamedir=self.path['gamedir'],hostname=self.gsconfig[steam_appid]['hostname'],serveradminpassowrd=self.gsconfig[steam_appid]['serveradminpassword'])
-
-
-        s = Screen(steam_appid, True)
-        s.send_commands(run_commands)
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer ' \
+                               'TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={serveradminpassowrd}' \
+                               .format(gamedir=self.path['gamedir'],
+                                       hostname=self.gsconfig[steam_appid]['hostname'],
+                                       serveradminpassowrd=self.gsconfig[steam_appid]['serveradminpassword']
+                                      )
+            s = Screen(steam_appid, True)
+            s.send_commands(run_commands)
 
     def stop(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
