@@ -26,7 +26,14 @@ GAME = {
 parser = ConfigParser.RawConfigParser()
 
 class GameServer(object):
+    """
+    The GameServer Class.
+    Handles common gameserver operations like configuration and steamcmd.
+    """
     def __init__(self,gsconfig):
+        """
+        Argument gsconfig is the configuration passed along by ConfigParser
+        """
         self.gsconfig = gsconfig
         if self.gsconfig:
             self.path = {
@@ -34,14 +41,14 @@ class GameServer(object):
                 'gamedir': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
             }
 
-    """
-    Configuration method of the shared information between engines
-    """
     def configure(self):
         """
-        Method used to loop through configuration lists and prompt the user
+        Configuration method of the shared information between engines
         """
         def configure_list(group, list):
+            """
+            Method used to loop through configuration lists and prompt the user
+            """
             for config_object in list:
                 while True:
                     user_input = raw_input(config_object['info'])
@@ -52,15 +59,15 @@ class GameServer(object):
                             group[config_object['option']] = user_input
                             break
                     if not config_object.get('default', None):
-                        pass #loop back and ask again
+                        #loop back and ask again
+                        pass
                     else:
-                        group[config_object['option']] = config_object['default']   # Default value set!
+                        # Default value set!
+                        group[config_object['option']] = config_object['default']
                         break
                 parser.set(group['id'], config_object['option'], group[config_object['option']])
 
-        """
-        Host of steamcmd options and data about the game files
-        """
+        # Host of steamcmd options and data about the game files
         steamcmd_options = [
                 {'option': 'user', 'info': 'Steam login: [anonymous] ', 'default': 'anonymous'},
                 {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
@@ -68,30 +75,22 @@ class GameServer(object):
                 {'option': 'appid', 'info': 'Steam AppID: '},
                 {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
         ]
-        """
-        Save the steam cmd configuration items
-        """
+
+        # Save the steam cmd configuration items
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
         configure_list(steamcmd,steamcmd_options)
 
         parser.write(open(CONFIG_FILE, 'w'))
-        print "Configuration file saved as {}".format(CONFIG_FILE)
+        print "Base configuration file saved as {}".format(CONFIG_FILE)
         # Base configuration is saved now. We can configure it with gameserver options
 
-        """
-        Load up the recently saved configuration so we can get basic information
-        about the game.
-        """
         # Load up the configuration file so we can parse the appid
         parser.read(CONFIG_FILE)
         gameserver_settings = parser._sections
         steam_appid = gameserver_settings['steamcmd']['appid']
         engine = gameserver_settings['steamcmd']['engine']
 
-        """
-        Here be options
-        """
         # Catch if the server is unreal or srcds. It matters.
         if engine == 'unreal':
             # Shared Unreal Options
@@ -108,6 +107,7 @@ class GameServer(object):
                 ]
 
             # Killing Floor 1
+            # Will add in a later version. No high demand for KF1
             elif steam_appid == '215360':
                 pass
 
@@ -156,7 +156,6 @@ class GameServer(object):
 
             # Team Fotress 2
             if steam_appid == '232250':
-                # Configuration options for TF2
                 options += [
                     {'option': 'mvm', 'info': 'Mann Versus Machine: [0] ', 'default': '0'},
                     {'option': 'timelimit', 'info': 'mp_timelimit: [40] ', 'default': '40'},
@@ -219,6 +218,7 @@ class GameServer(object):
                 ]
 
         else:
+            # Just in case an engine is hardcoded that is not supported.
             print "Something went wrong. Your engine: '%s' is not supported. You should not even be reading this!" % engine
             print "Reconfigure the script and follow the prompts. Manual configuration is not a wise choice."
             exit()
@@ -233,11 +233,11 @@ class GameServer(object):
         print "Configuration file saved as {}".format(CONFIG_FILE)
 
 
-    """
-    Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
-    link changes. STEAMCMD_DOWNLOAD can be found at the top of this class file.
-    """
     def install_steamcmd(self):
+        """
+        Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
+        link changes. STEAMCMD_DOWNLOAD can be found at the top of this class file.
+        """
         if self.gsconfig:
             while True:
                 if os.path.exists(self.path['steamcmd']):
@@ -253,10 +253,10 @@ class GameServer(object):
         else:
             print "Error: No configuration file found. Please run with the --configure option"
 
-    """
-    Method to update game files with the validate option
-    """
     def update_game_validate(self):
+        """
+        Method to update game files with the validate option
+        """
         steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
                        ' +force_install_dir {installdir} +app_update {id} validate +quit' \
                        .format(steamcmdpath=self.path['steamcmd'],
@@ -267,10 +267,10 @@ class GameServer(object):
                               )
         subprocess.call(steamcmd_run, shell=True)
 
-    """
-    Method to update game files without the validate option
-    """
     def update_game_novalidate(self):
+        """
+        Method to update game files without the validate option
+        """
         steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
                        ' +force_install_dir {installdir} +app_update {id} +quit' \
                        .format(steamcmdpath=self.path['steamcmd'],
@@ -282,7 +282,14 @@ class GameServer(object):
         subprocess.call(steamcmd_run, shell=True)
 
 class SRCDSGameServer(GameServer):
+    """
+    The SRCDS specific class operations.
+    This will handle starting, stopping and getting a server's status.
+    """
     def __init__(self,gsconfig):
+        """
+        Argument gsconfig is the configuration passed along by ConfigParser
+        """
         self.gsconfig = gsconfig
         if self.gsconfig:
             self.path = {
@@ -291,9 +298,14 @@ class SRCDSGameServer(GameServer):
             }
 
     def start(self):
+        """
+        Method to start the SRCDS gameserver.
+        There is a lot of customization going on here for each game.
+        """
         steam_appid = self.gsconfig['steamcmd']['appid']
-        # Catch CSGO gamemode and mapgroup, then start it up
+        # CSGO
         if steam_appid == '740':
+            # Figure out if there is a mapgroup to go with this launch.
             if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
                 srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
                                '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} '\
@@ -343,6 +355,7 @@ class SRCDSGameServer(GameServer):
             else:
                 gamemode_launch = ''
 
+        # TF2
         elif steam_appid == '232250':
             # Catch mann versus machine
             if self.gsconfig[steam_appid]['mvm'] == '1':
@@ -448,6 +461,10 @@ class SRCDSGameServer(GameServer):
         s.send_commands(srcds_run)
 
     def stop(self):
+        """
+        Method to stop the server.
+        """
+        # The steam appid
         steam_appid = self.gsconfig['steamcmd']['appid']
         if self.status():
             s = Screen(steam_appid)
@@ -456,16 +473,20 @@ class SRCDSGameServer(GameServer):
         else:
            print "Server is not running."
 
-    """
-    Method to check the server's status
-    """
     def status(self):
+        """
+        Method to check the server's status
+        """
         steam_appid = self.gsconfig['steamcmd']['appid']
         s = Screen(steam_appid)
         is_server_running = s.exists
         return is_server_running
 
     def create_runscript(self):
+        """
+        A runscript is required for steamcmd to update the server at start.
+        Because this is very useful, we provide a method to do just that.
+        """
         steam_appid = self.gsconfig['steamcmd']['appid']
         with open(os.path.join('templates', 'runscript.txt'), "r") as file:
             x = file.read()
@@ -487,6 +508,12 @@ class SRCDSGameServer(GameServer):
         print "runscript.txt created"
 
     def create_motd(self):
+        """
+        The MOTD is a webpage that loads up when a player enters a SRCDS game.
+        The MOTD is formatted with a single URL (http://) included.
+        HTTPS is not supported by SRCDS's MOTD.
+        Example: http://yoursite.com/motd.html
+        """
         steam_appid = self.gsconfig['steamcmd']['appid']
         with open(os.path.join('templates', 'motd.txt'), "r") as file:
             x = file.read()
@@ -504,6 +531,12 @@ class SRCDSGameServer(GameServer):
         print "motd.txt saved"
 
     def create_servercfg(self):
+        """
+        Create a server.cfg file based on the settings configured by the script.
+        A user is not limited to the cvar's set in this script, it allows a good
+        base of cvars to use. Users can edit the server.cfg file by hand, but the
+        file will be overwritten when --servercfg argument is passed to the script.
+        """
         with open(os.path.join('templates', 'server.cfg'), "r") as file:
             x = file.read()
             template = Template(x)
@@ -522,7 +555,14 @@ class SRCDSGameServer(GameServer):
         print "server.cfg saved"
 
 class UnrealGameServer(GameServer):
+    """
+    The Unreal specific class operations.
+    This will handle starting, stopping and getting a server's status.
+    """
     def __init__(self,gsconfig):
+        """
+        Argument gsconfig is the configuration passed along by ConfigParser
+        """
         self.gsconfig = gsconfig
         if self.gsconfig:
             self.path = {
@@ -531,10 +571,15 @@ class UnrealGameServer(GameServer):
             }
 
     def start(self):
-    #./ShooterGameServer TheIsland?listen?SessionName=<server_name>?ServerPassword=<join_password>?ServerAdminPassword=<admin_password> -server -log
+        """
+        Method to start the Unreal gameserver.
+        There is a lot of customization going on here for each game.
+        """
+        # The Steam Appid
         steam_appid = self.gsconfig['steamcmd']['appid']
-        # Start Ark
+        # Ark: Survival Evolved
         if steam_appid == '376030':
+            # Catch if there is a password set in the server configuration
             if self.gsconfig[steam_appid]['serverpassword'] != 'ignore':
                 run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer ' \
                                'TheIsland?Listen?SessionName={hostname}?ServerPassword={serverpassword}' \
@@ -555,6 +600,10 @@ class UnrealGameServer(GameServer):
             s.send_commands(run_commands)
 
     def stop(self):
+        """
+        Method to stop the server.
+        """
+        # Steam appid
         steam_appid = self.gsconfig['steamcmd']['appid']
         if self.status():
             s = Screen(steam_appid)
@@ -563,10 +612,10 @@ class UnrealGameServer(GameServer):
         else:
            print "Server is not running."
 
-    """
-    Method to check the server's status
-    """
     def status(self):
+        """
+        Method to check the server's status
+        """
         steam_appid = self.gsconfig['steamcmd']['appid']
         s = Screen(steam_appid)
         is_server_running = s.exists

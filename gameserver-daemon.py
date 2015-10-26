@@ -1,17 +1,22 @@
 import sys
 import os.path
+
 import ConfigParser
 import argparse
 import subprocess
+
 from GameServer import GameServer
 from GameServer import SRCDSGameServer
 from GameServer import UnrealGameServer
 
-
+# The server.conf fille name.
+# Change this if you want things to break.
 CONFIG_FILE = "server.conf"
 
+# Don't touch this. This is ConfigParser's shortcut.
 parser = ConfigParser.RawConfigParser()
 
+# Argparser's arguments!
 argparser = argparse.ArgumentParser(description="f0rkz gameserver daemon. Used to manage gameserver files.")
 argparser.add_argument("--configure", help="Run the configuration tool and exit.", action="store_true")
 argparser.add_argument("-u", "--update", help="Update the gameserver files.", action="store_true")
@@ -85,66 +90,44 @@ if os.path.isfile(CONFIG_FILE):
     parser.read(CONFIG_FILE)
     gameserver = parser._sections
     engine = gameserver['steamcmd']['engine']
+
+    # SRCDS specific operations
     if engine == "srcds":
+        myserver = SRCDSGameServer(gsconfig=gameserver)
         if args.servercfg:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             myserver.create_servercfg()
 
         if args.motd:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             myserver.create_motd()
 
         if args.runscript:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             myserver.create_runscript()
 
         if args.start:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             if myserver.status():
                 sys.exit("Server is running. Please stop or restart your server.")
             else:
                 myserver.start()
 
         if args.stop:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             myserver.stop()
 
         if args.restart:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = SRCDSGameServer(gsconfig=gameserver)
             myserver.stop()
             myserver.start()
 
+    # Unreal specific operations
     if engine == "unreal":
+        myserver = UnrealGameServer(gsconfig=gameserver)
         if args.start:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = UnrealGameServer(gsconfig=gameserver)
             if myserver.status():
                 sys.exit("Server is running. Please stop or restart your server.")
             else:
                 myserver.start()
 
         if args.stop:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = UnrealGameServer(gsconfig=gameserver)
             myserver.stop()
 
         if args.restart:
-            #parser.read(CONFIG_FILE)
-            #gameserver = parser._sections
-            myserver = UnrealGameServer(gsconfig=gameserver)
             myserver.stop()
             myserver.start()
