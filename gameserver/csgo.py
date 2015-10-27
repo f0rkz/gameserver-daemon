@@ -1,0 +1,2 @@
+class CSGOServer(GameServer):
+    pass

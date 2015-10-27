@@ -1,0 +1,2 @@
+class BMSServer(GameServer):
+    pass

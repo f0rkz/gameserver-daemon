@@ -1,0 +1,2 @@
+class GSModServer(GameServer):
+    pass
