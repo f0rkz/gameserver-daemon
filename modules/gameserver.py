@@ -67,6 +67,8 @@ class GameServer(object):
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
         self.configure_list(steamcmd,configure_options)
+        # Let's add a game path
+        parser.set('steamcmd', 'gamepath', os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']))
         parser.write(open(CONFIG_FILE, 'w'))
         print "Base configuration file saved as {}".format(CONFIG_FILE)
 
@@ -111,10 +113,10 @@ class GameServer(object):
         """
         steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
                        ' +force_install_dir {installdir} +app_update {id} +quit' \
-                       .format(steamcmdpath=self.path['steamcmd'],
+                       .format(steamcmdpath=self.gsconfig['steamcmd']['path'],
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
-                               installdir=self.path['gamedir'],
+                               installdir=self.gsconfig['steamcmd']['gamepath'],
                                id=self.gsconfig['steamcmd']['appid']
                               )
         subprocess.call(steamcmd_run, shell=True)
