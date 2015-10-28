@@ -13,7 +13,7 @@ parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
 class L4D2Server(GameServer):
-    def __init__(self):
+    def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
