@@ -50,7 +50,7 @@ if steam_appid and gameserver:
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
         argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
-    if engine == 'unreal' and os.path.isdir(gameserver['steamcmd']['path']:
+    if engine == 'unreal' and os.path.isdir(gameserver['steamcmd']['path']):
         # Stuff for unreal
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
