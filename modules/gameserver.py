@@ -87,6 +87,6 @@ class GameServer(object):
                 else:
                     # Create the directory
                     os.makedirs(self.gsconfig['steamcmd']['path'])
-            print "Steamcmd installed to {dir}".format(dir=self.gsconfig['steamcmd']['dir'])
+            print "Steamcmd installed to {dir}".format(self.gsconfig['steamcmd']['dir'])
         else:
             print "Error: No configuration file found. Please run with the --configure option"
