@@ -50,7 +50,7 @@ class GameServer(object):
                     # Default value set!
                     group[config_object['option']] = config_object['default']
                     break
-        parser.set(group['id'], config_object['option'], group[config_object['option']])
+                parser.set(group['id'], config_object['option'], group[config_object['option']])
 
     def configure(self):
         """

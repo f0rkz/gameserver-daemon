@@ -11,7 +11,7 @@ from modules.unreal import Unreal
 #from GameServer import SRCDSGameServer
 #from GameServer import UnrealGameServer
 
-# The server.conf fille name.
+# The server.conf file name.
 # Change this if you want things to break.
 CONFIG_FILE = "server.conf"
 
