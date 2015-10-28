@@ -1,3 +1,14 @@
+import ConfigParser
+import os.path
+import sys
+import urllib
+import subprocess
+import tarfile
+from jinja2 import Template
+from screenutils import list_screens, Screen
+
+from modules.gameserver import GameServer
+
 class SRCDS(GameServer):
     def __init__(self):
         # Bring the gsconfig and path variables over
