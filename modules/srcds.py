@@ -18,6 +18,11 @@ class SRCDS(GameServer):
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def configure_list(self, group, options):
         """
@@ -83,3 +88,50 @@ class SRCDS(GameServer):
         self.configure_list(myid,config_options)
         parser.write(open(CONFIG_FILE, 'w'))
         print "Configuration saved as {}".format(CONFIG_FILE)
+
+    def create_motd(self):
+        """
+        The MOTD is a webpage that loads up when a player enters a SRCDS game.
+        The MOTD is formatted with a single URL (http://) included.
+        HTTPS is not supported by SRCDS's MOTD.
+        Example: http://yoursite.com/motd.html
+        """
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        with open(os.path.join('templates', 'motd.txt'), "r") as file:
+            x = file.read()
+
+            template = Template(x)
+
+            motd_vars = {
+                        'motd': self.gsconfig[steam_appid]['motd'],
+            }
+
+            output = template.render(motd_vars)
+
+            with open(os.path.join(self.path['game'],GAME[steam_appid],'motd.txt'), "wb") as outfile:
+                outfile.write(output)
+        print "motd.txt saved"
+
+    def create_servercfg(self):
+        """
+        Create a server.cfg file based on the settings configured by the script.
+        A user is not limited to the cvar's set in this script, it allows a good
+        base of cvars to use. Users can edit the server.cfg file by hand, but the
+        file will be overwritten when --servercfg argument is passed to the script.
+        """
+        with open(os.path.join('templates', 'server.cfg'), "r") as file:
+            x = file.read()
+            template = Template(x)
+
+            appid = self.gsconfig['steamcmd']['appid']
+            srcds_vars = self.gsconfig[appid]
+
+            output = template.render(srcds_vars)
+
+            if appid == '346680':
+                with open(os.path.join(self.path['game'],GAME[appid],'cfg','servercustom.cfg'), "wb") as outfile:
+                    outfile.write(output)
+            else:
+                with open(os.path.join(self.path['game'],GAME[appid],'cfg','server.cfg'), "wb") as outfile:
+                    outfile.write(output)
+        print "server.cfg saved"

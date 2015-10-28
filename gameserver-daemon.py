@@ -155,3 +155,60 @@ if os.path.isfile(CONFIG_FILE) and args.update:
         update.update_game_validate()
     else:
         update.update_game_novalidate()
+
+# MOTD
+if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.motd:
+    gameserver = load_configuration(CONFIG_FILE)
+    motd = SRCDS(gsconfig = gameserver)
+    motd.create_motd()
+
+# Server.cfg creation
+if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
+    gameserver = load_configuration(CONFIG_FILE)
+    servercfg = SRCDS(gsconfig = gameserver)
+    servercfg.create_servercfg()
+
+# Start operations
+# CSGO
+if steam_appid == '740' and args.start:
+    pass
+# TF2
+elif steam_appid == '232250' and args.start:
+    pass
+# HL2DM
+elif steam_appid == '232370' and args.start:
+    pass
+# BMS
+elif steam_appid == '346680' and args.start:
+    pass
+# left4dead2
+elif steam_appid == '222860' and args.start:
+    pass
+# ARK
+elif steam_appid == '376030' and args.start:
+    pass
+# GSMOD
+elif steam_appid == '4020' and args.start:
+    pass
+# Stop operations
+# CSGO
+if steam_appid == '740' and args.stop:
+    pass
+# TF2
+elif steam_appid == '232250' and args.stop:
+    pass
+# HL2DM
+elif steam_appid == '232370' and args.stop:
+    pass
+# BMS
+elif steam_appid == '346680' and args.stop:
+    pass
+# left4dead2
+elif steam_appid == '222860' and args.stop:
+    pass
+# ARK
+elif steam_appid == '376030' and args.stop:
+    pass
+# GSMOD
+elif steam_appid == '4020' and args.stop:
+    pass
