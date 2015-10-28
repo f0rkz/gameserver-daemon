@@ -5,7 +5,7 @@ import ConfigParser
 import argparse
 import subprocess
 
-from GameServer import GameServer
+from gameserver import GameServer
 from gameserver.srcds import SRCDS
 from gameserver.unreal import Unreal
 #from GameServer import SRCDSGameServer
