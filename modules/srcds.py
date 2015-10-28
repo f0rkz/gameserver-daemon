@@ -54,7 +54,7 @@ class SRCDS(GameServer):
             {'option': 'sv_setsteamaccount', 'info': 'sv_setsteamaccount: [] ', 'default': 'ignore'},
         ]
         myid = {'id': self.steam_appid}
-        parser.add_section(myid)
+        parser.add_section(self.steam_appid)
         GameServer.configure_list(myid,config_options)
         parser.write(open(CONFIG_FILE, 'w'))
         print "SRCDS configuration saved as {}".format(CONFIG_FILE)
