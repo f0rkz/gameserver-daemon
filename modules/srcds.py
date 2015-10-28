@@ -19,6 +19,11 @@ class SRCDS(GameServer):
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
 
+    def load_configuration(self, config):
+        parser.read(config)
+        gameserver = parser._sections
+        return gameserver
+
     def configure_list(self, group, options):
         """
         Method used to loop through configuration lists and prompt the user
@@ -77,6 +82,7 @@ class SRCDS(GameServer):
             {'option': 'motd', 'info': 'MOTD URL: [] ', 'default': 'ignore'},
             {'option': 'sv_setsteamaccount', 'info': 'sv_setsteamaccount: [] ', 'default': 'ignore'},
         ]
+        self.load_configuration
         myid = {'id': self.steam_appid}
         parser.add_section(self.steam_appid)
         self.configure_list(myid,config_options)
