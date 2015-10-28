@@ -5,11 +5,19 @@ import ConfigParser
 import argparse
 import subprocess
 
+# Base modules
 from modules.gameserver import GameServer
 from modules.srcds import SRCDS
 from modules.unreal import Unreal
-#from GameServer import SRCDSGameServer
-#from GameServer import UnrealGameServer
+
+# Game specific modules
+from modules.ark import ARKServer
+from modules.bms import BMSServer
+from modules.csgo import CSGOServer
+from modules.gsmod import GSModServer
+from modules.hl2dm import HL2DMServer
+from modules.l4d2 import L4D2Server
+from modules.tf2 import TF2Server
 
 # The server.conf file name.
 # Change this if you want things to break.
@@ -79,7 +87,7 @@ if os.path.isfile(CONFIG_FILE) and args.configure:
         sys.exit("Configuration will not be removed. Exiting.")
 
 if not os.path.isfile(CONFIG_FILE) and args.configure:
-    base_config = GameServer(gsconfig=gameserver)
+    base_config = GameServer(gsconfig = gameserver)
     base_config.configure()
 
     # Load up the configuration after the base is installed
@@ -88,12 +96,43 @@ if not os.path.isfile(CONFIG_FILE) and args.configure:
     steamcmd_path = gameserver['steamcmd']['path']
     engine = gameserver['steamcmd']['engine']
 
+    # Begin the game engine shared configuration
     # SRCDS configuration
     if engine == 'srcds':
-        engine_config = SRCDS(gsconfig=gameserver)
+        engine_config = SRCDS(gsconfig = gameserver)
         engine_config.configure()
 
     # Unreal configuration
     elif engine == 'unreal':
-        engine_config = Unreal(gsconfig=gameserver)
+        engine_config = Unreal(gsconfig = gameserver)
         engine_config.configure()
+
+    # Begin the gameserver's configuration modules
+    # CSGO
+    if steam_appid = '740':
+        game_config = CSGOServer(gsconfig = gameserver)
+        game_config.configure()
+    # TF2
+    elif steam_appid = '232250':
+        game_config = TF2Server(gsconfig = gameserver)
+        game_config.configure()
+    # HL2DM
+    elif steam_appid = '232370':
+        game_config = HL2DMServer(gsconfig = gameserver)
+        game_config.configure()
+    # BMS
+    elif steam_appid = '346680':
+        game_config = BMSServer(gsconfig = gameserver)
+        game_config.configure()
+    # left4dead2
+    elif steam_appid = '222860':
+        game_config = L4D2Server(gsconfig = gameserver)
+        game_config.configure()
+    # ARK
+    elif steam_appid = '376030':
+        game_config = ARKServer(gsconfig = gameserver)
+        game_config.configure()
+    # GSMOD
+    elif steam_appid = '4020':
+        game_config = GSModServer(gsconfig = gameserver)
+        game_config.configure()

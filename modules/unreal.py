@@ -16,6 +16,7 @@ class Unreal(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
+        self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
 
     def configure_list(self, group, options):
@@ -45,3 +46,9 @@ class Unreal(GameServer):
             {'option': 'ip', 'info': 'Gameserver IP: [0.0.0.0] ', 'default': '0.0.0.0'},
             {'option': 'hostname', 'info': 'Gameserver Hostname: [My Gameserver] ', 'default': 'My Gameserver'},
         ]
+        parser.read(CONFIG_FILE)
+        myid = {'id': self.steam_appid}
+        parser.add_section(self.steam_appid)
+        self.configure_list(myid,config_options)
+        parser.write(open(CONFIG_FILE, 'w'))
+        print "Configuration saved as {}".format(CONFIG_FILE)
