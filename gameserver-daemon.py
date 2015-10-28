@@ -142,3 +142,16 @@ if os.path.isfile(CONFIG_FILE) and args.steamcmd:
     gameserver = load_configuration(CONFIG_FILE)
     steamcmd = GameServer(gsconfig = gameserver)
     steamcmd.install_steamcmd()
+
+# Update gamefiles
+if os.path.isfile(CONFIG_FILE) and args.update:
+    gameserver = load_configuration(CONFIG_FILE)
+    update = GameServer(gsconfig = gameserver)
+    install_dir = os.path.join(gameserver['steamcmd']['path'], '')
+    if not os.path.isfile(os.path.join(install_dir, 'steamcmd.sh')):
+        print "Steamcmd was not found. Installing steamcmd."
+        update.install_steamcmd()
+    if args.validate:
+        update.update_game_validate()
+    else:
+        update.update_game_novalidate()

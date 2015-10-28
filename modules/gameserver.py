@@ -90,3 +90,31 @@ class GameServer(object):
             print "Steamcmd installed to {dir}".format(dir=self.gsconfig['steamcmd']['path'])
         else:
             print "Error: No configuration file found. Please run with the --configure option"
+
+    def update_game_validate(self):
+        """
+        Method to update game files with the validate option
+        """
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
+                       ' +force_install_dir {installdir} +app_update {id} validate +quit' \
+                       .format(steamcmdpath=self.path['steamcmd'],
+                               login=self.gsconfig['steamcmd']['user'],
+                               password=self.gsconfig['steamcmd']['password'],
+                               installdir=self.path['gamedir'],
+                               id=self.gsconfig['steamcmd']['appid']
+                              )
+        subprocess.call(steamcmd_run, shell=True)
+
+    def update_game_novalidate(self):
+        """
+        Method to update game files without the validate option
+        """
+        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
+                       ' +force_install_dir {installdir} +app_update {id} +quit' \
+                       .format(steamcmdpath=self.path['steamcmd'],
+                               login=self.gsconfig['steamcmd']['user'],
+                               password=self.gsconfig['steamcmd']['password'],
+                               installdir=self.path['gamedir'],
+                               id=self.gsconfig['steamcmd']['appid']
+                              )
+        subprocess.call(steamcmd_run, shell=True)
