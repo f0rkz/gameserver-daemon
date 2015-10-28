@@ -10,6 +10,7 @@ from screenutils import list_screens, Screen
 from modules.gameserver import GameServer
 
 parser = ConfigParser.RawConfigParser()
+CONFIG_FILE = "server.conf"
 
 class SRCDS(GameServer):
     def __init__(self, gsconfig):
