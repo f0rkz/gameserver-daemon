@@ -32,7 +32,6 @@ class TF2Server(GameServer):
         ]
         parser.read(CONFIG_FILE)
         myid = {'id': self.steam_appid}
-        parser.add_section(self.steam_appid)
         self.configure_list(myid,config_options)
         parser.write(open(CONFIG_FILE, 'w'))
         print "Configuration saved as {}".format(CONFIG_FILE)
