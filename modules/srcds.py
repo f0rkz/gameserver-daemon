@@ -12,6 +12,17 @@ from modules.gameserver import GameServer
 parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '232250': 'tf',
+    '740': 'csgo',
+    '232370': 'hl2mp',
+    '346680': 'bms',
+    '222860': 'left4dead2',
+    '376030': 'ShooterGame',
+}
+
 class SRCDS(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
