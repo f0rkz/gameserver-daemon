@@ -22,21 +22,18 @@ parser = ConfigParser.RawConfigParser()
 def load_configuration(config):
     parser.read(config)
     gameserver = parser._sections
-    steam_appid = gameserver['steamcmd']['appid']
-    engine = gameserver['steamcmd']['engine']
+    return gameserver
 
 # Load the current configuration and a default suite of args for argparser
 if os.path.isfile(CONFIG_FILE):
-    load_configuration(CONFIG_FILE)
+    gameserver = load_configuration(CONFIG_FILE)
 else:
     gameserver = False
-    steam_appid = False
-    engine = False
 
 # The default argparse description
 argparser = argparse.ArgumentParser(description="f0rkz gameserver daemon. Used to manage gameserver files.")
 # Check if steam_appid is loaded up
-if steam_appid and gameserver:
+if gameserver['steamcmd']['appid']:
     # Basic shared items
     argparser.add_argument("--configure", help="Run the configuration tool and exit.", action="store_true")
     argparser.add_argument("-u", "--update", help="Update the gameserver files.", action="store_true")
@@ -44,7 +41,7 @@ if steam_appid and gameserver:
     argparser.add_argument("--steamcmd", help="Install steamcmd to the configured directory.", action="store_true")
 
     # Begin loading each option for the configured game
-    if engine == 'srcds' and os.path.isdir(gameserver['steamcmd']['path']):
+    if gameserver['steamcmd']['engine'] == 'srcds' and os.path.isdir(gameserver['steamcmd']['path']):
         # Stuff for srcds
         argparser.add_argument("--runscript", help="Generate the runscript.txt file.", action="store_true")
         argparser.add_argument("--servercfg", help="Generate the server.cfg file", action="store_true")
@@ -52,7 +49,7 @@ if steam_appid and gameserver:
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
         argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
-    if engine == 'unreal' and os.path.isdir(gameserver['steamcmd']['path']):
+    if gameserver['steamcmd']['engine'] == 'unreal' and os.path.isdir(gameserver['steamcmd']['path']):
         # Stuff for unreal
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
@@ -79,7 +76,7 @@ if not os.path.isfile(CONFIG_FILE) and args.configure:
     base_config = GameServer(gsconfig=gameserver)
     base_config.configure()
     # Load up the configuration after the base is installed
-    load_configuration(CONFIG_FILE)
+    gameserver = load_configuration(CONFIG_FILE)
     # SRCDS configuration
     if engine == 'srcds':
         engine_config = SRCDS(gsconfig=gameserver)
