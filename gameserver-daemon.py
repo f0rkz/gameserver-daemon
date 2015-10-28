@@ -136,3 +136,9 @@ if not os.path.isfile(CONFIG_FILE) and args.configure:
     elif steam_appid == '4020':
         game_config = GSModServer(gsconfig = gameserver)
         game_config.configure()
+
+# Steam cmd install
+if os.path.isfile(CONFIG_FILE) and args.steamcmd:
+    gameserver = load_configuration(CONFIG_FILE)
+    steamcmd = GameServer(gsconfig = gameserver)
+    steamcmd.install_steamcmd()

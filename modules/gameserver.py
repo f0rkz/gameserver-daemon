@@ -69,3 +69,23 @@ class GameServer(object):
         self.configure_list(steamcmd,configure_options)
         parser.write(open(CONFIG_FILE, 'w'))
         print "Base configuration file saved as {}".format(CONFIG_FILE)
+
+    def install_steamcmd(self):
+        """
+        Method to install steamcmd from the web. Modify STEAMCMD_DOWNLOAD if the
+        link changes. STEAMCMD_DOWNLOAD can be found at the top of this class file.
+        """
+        if self.gsconfig:
+            while True:
+                if os.path.exists(self.path['steamcmd']):
+                    INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
+                    #Download steamcmd and extract it
+                    urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
+                    steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
+                    steamcmd_tar.extractall(INSTALL_DIR)
+                    break
+                else:
+                    # Create the directory
+                    os.makedirs(self.path['steamcmd'])
+        else:
+            print "Error: No configuration file found. Please run with the --configure option"
