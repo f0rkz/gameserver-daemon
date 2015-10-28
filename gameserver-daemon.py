@@ -84,6 +84,9 @@ if not os.path.isfile(CONFIG_FILE) and args.configure:
 
     # Load up the configuration after the base is installed
     gameserver = load_configuration(CONFIG_FILE)
+    steam_appid = gameserver['steamcmd']['appid']
+    steamcmd_path = gameserver['steamcmd']['path']
+    engine = gameserver['steamcmd']['engine']
 
     # SRCDS configuration
     if engine == 'srcds':
