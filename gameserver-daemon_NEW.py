@@ -6,8 +6,10 @@ import argparse
 import subprocess
 
 from GameServer import GameServer
-from GameServer import SRCDSGameServer
-from GameServer import UnrealGameServer
+from srcds import SRCDS
+from unreal import Unreal
+#from GameServer import SRCDSGameServer
+#from GameServer import UnrealGameServer
 
 # The server.conf fille name.
 # Change this if you want things to break.
