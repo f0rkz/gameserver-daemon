@@ -24,6 +24,8 @@ if os.path.isfile(CONFIG_FILE):
     engine = gameserver['steamcmd']['engine']
 else:
     gameserver = False
+    steam_appid = False
+    engine = False
 
 # The default argparse description
 argparser = argparse.ArgumentParser(description="f0rkz gameserver daemon. Used to manage gameserver files.")
