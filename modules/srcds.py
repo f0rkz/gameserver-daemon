@@ -9,11 +9,14 @@ from screenutils import list_screens, Screen
 
 from modules.gameserver import GameServer
 
+parser = ConfigParser.RawConfigParser()
+
 class SRCDS(GameServer):
-    def __init__(self,gsconfig):
+    def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
-        steam_appid = self.gsconfig['steamcmd']['appid']
+        self.gsconfig = gsconfig
+        self.steam_appid = self.gsconfig['steamcmd']['appid']
     def configure(self):
         config_options = [
             {'option': 'hostname', 'info': 'Gameserver hostname: [My Gameserver] ', 'default': 'My Gameserver'},
@@ -50,7 +53,7 @@ class SRCDS(GameServer):
             {'option': 'motd', 'info': 'MOTD URL: [] ', 'default': 'ignore'},
             {'option': 'sv_setsteamaccount', 'info': 'sv_setsteamaccount: [] ', 'default': 'ignore'},
         ]
-        myid = {'id': steam_appid}
+        myid = {'id': self.steam_appid}
         parser.add_section(myid)
         GameServer.configure_list(myid,config_options)
         parser.write(open(CONFIG_FILE, 'w'))
