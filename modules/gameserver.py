@@ -30,6 +30,11 @@ class GameServer(object):
     def __init__(self, gsconfig):
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
     def configure_list(self, group, options):
         """
         Method used to loop through configuration lists and prompt the user
@@ -67,8 +72,6 @@ class GameServer(object):
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
         self.configure_list(steamcmd,configure_options)
-        # Let's add a game path
-        parser.set('steamcmd', 'gamepath', os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']))
         parser.write(open(CONFIG_FILE, 'w'))
         print "Base configuration file saved as {}".format(CONFIG_FILE)
 
@@ -79,8 +82,8 @@ class GameServer(object):
         """
         if self.gsconfig:
             while True:
-                if os.path.exists(self.gsconfig['steamcmd']['path']):
-                    INSTALL_DIR = os.path.dirname(self.gsconfig['steamcmd']['path'])
+                if os.path.exists(self.path['steamcmd']):
+                    INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
                     #Download steamcmd and extract it
                     urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
                     steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
@@ -88,8 +91,8 @@ class GameServer(object):
                     break
                 else:
                     # Create the directory
-                    os.makedirs(self.gsconfig['steamcmd']['path'])
-            print "Steamcmd installed to {dir}".format(dir=self.gsconfig['steamcmd']['path'])
+                    os.makedirs(self.path['steamcmd'])
+            print "Steamcmd installed to {dir}".format(dir=self.path['steamcmd'])
         else:
             print "Error: No configuration file found. Please run with the --configure option"
 
@@ -113,10 +116,10 @@ class GameServer(object):
         """
         steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
                        ' +force_install_dir {installdir} +app_update {id} +quit' \
-                       .format(steamcmdpath=self.gsconfig['steamcmd']['path'],
+                       .format(steamcmdpath=self.path['steamcmd'],
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
-                               installdir=self.gsconfig['steamcmd']['gamepath'],
+                               installdir=self.path['game'],
                                id=self.gsconfig['steamcmd']['appid']
                               )
         subprocess.call(steamcmd_run, shell=True)
