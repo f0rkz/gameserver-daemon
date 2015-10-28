@@ -77,8 +77,8 @@ class GameServer(object):
         """
         if self.gsconfig:
             while True:
-                if os.path.exists(self.path['steamcmd']):
-                    INSTALL_DIR = os.path.dirname(self.path['steamcmd'])
+                if os.path.exists(self.gameserver['steamcmd']['path']):
+                    INSTALL_DIR = os.path.dirname(self.gameserver['steamcmd']['path'])
                     #Download steamcmd and extract it
                     urllib.urlretrieve(STEAMCMD_DOWNLOAD, os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'))
                     steamcmd_tar = tarfile.open(os.path.join(INSTALL_DIR, 'steamcmd_linux.tar.gz'), 'r:gz')
