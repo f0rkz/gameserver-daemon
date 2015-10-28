@@ -109,30 +109,30 @@ if not os.path.isfile(CONFIG_FILE) and args.configure:
 
     # Begin the gameserver's configuration modules
     # CSGO
-    if steam_appid = '740':
+    if steam_appid == '740':
         game_config = CSGOServer(gsconfig = gameserver)
         game_config.configure()
     # TF2
-    elif steam_appid = '232250':
+    elif steam_appid == '232250':
         game_config = TF2Server(gsconfig = gameserver)
         game_config.configure()
     # HL2DM
-    elif steam_appid = '232370':
+    elif steam_appid == '232370':
         game_config = HL2DMServer(gsconfig = gameserver)
         game_config.configure()
     # BMS
-    elif steam_appid = '346680':
+    elif steam_appid == '346680':
         game_config = BMSServer(gsconfig = gameserver)
         game_config.configure()
     # left4dead2
-    elif steam_appid = '222860':
+    elif steam_appid == '222860':
         game_config = L4D2Server(gsconfig = gameserver)
         game_config.configure()
     # ARK
-    elif steam_appid = '376030':
+    elif steam_appid == '376030':
         game_config = ARKServer(gsconfig = gameserver)
         game_config.configure()
     # GSMOD
-    elif steam_appid = '4020':
+    elif steam_appid == '4020':
         game_config = GSModServer(gsconfig = gameserver)
         game_config.configure()
