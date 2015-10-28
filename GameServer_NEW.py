@@ -66,3 +66,5 @@ class GameServer(object):
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
         self.configure_list(steamcmd,configure_options)
+        parser.write(open(CONFIG_FILE, 'w'))
+        print "Base configuration file saved as {}".format(CONFIG_FILE)
