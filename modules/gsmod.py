@@ -45,10 +45,26 @@ class GSModServer(GameServer):
         pass
 
     def status(self):
-        pass
+        """
+        Method to check the server's status
+        """
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        s = Screen(steam_appid)
+        is_server_running = s.exists
+        return is_server_running
 
     def start(self):
         pass
 
     def stop(self):
-        pass
+        """
+        Method to stop the server.
+        """
+        # Steam appid
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.status():
+            s = Screen(steam_appid)
+            s.kill()
+            print "Server stopped."
+        else:
+           print "Server is not running."
