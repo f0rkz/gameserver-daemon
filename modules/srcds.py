@@ -100,6 +100,31 @@ class SRCDS(GameServer):
         parser.write(open(CONFIG_FILE, 'w'))
         print "Configuration saved as {}".format(CONFIG_FILE)
 
+    def create_runscript(self):
+        """
+        A runscript is required for steamcmd to update the server at start.
+        Because this is very useful, we provide a method to do just that.
+        """
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        with open(os.path.join('templates', 'runscript.txt'), "r") as file:
+            x = file.read()
+
+            template = Template(x)
+
+            runscript_vars = {
+                            'steamlogin': self.gsconfig['steamcmd']['user'],
+                            'steampassword': self.gsconfig['steamcmd']['password'],
+                            'install_dir': os.path.join(self.path['game'], ''),
+                            'appid': steam_appid,
+            }
+
+            output = template.render(runscript_vars)
+
+            with open(os.path.join(self.path['steamcmd'],'runscript.txt'), "wb") as outfile:
+                outfile.write(output)
+
+        print "runscript.txt created"
+
     def create_motd(self):
         """
         The MOTD is a webpage that loads up when a player enters a SRCDS game.

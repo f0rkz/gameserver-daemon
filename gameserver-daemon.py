@@ -162,6 +162,12 @@ if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.motd:
     motd = SRCDS(gsconfig = gameserver)
     motd.create_motd()
 
+# Runscript creation
+if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.runscript:
+    gameserver = load_configuration(CONFIG_FILE)
+    runscript = SRCDS(gsconfig = gameserver)
+    runscript.create_runscript()
+
 # Server.cfg creation
 if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
     gameserver = load_configuration(CONFIG_FILE)
