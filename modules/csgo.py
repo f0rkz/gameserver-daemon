@@ -134,8 +134,8 @@ class CSGOServer(GameServer):
 
                 elif gamemode == 'deathmatch':
                     extra_parameters = "+game_type 1 +game_mode 2"
-            else:
-                gamemode_launch = ''
+                else:
+                    gamemode_launch = ''
 
         # Form up the SRCDS launch command
         srcds_run = '{path}/srcds_run {launch} {extra}' \
