@@ -12,12 +12,23 @@ from modules.gameserver import GameServer
 parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '232250': 'tf',
+}
+
 class TF2Server(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def configure_list(self, group, options):
         """
@@ -68,7 +79,41 @@ class TF2Server(GameServer):
         return is_server_running
 
     def start(self):
-        pass
+        if self.gsconfig[steam_appid]['mvm'] == '1':
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 '\
+                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
+            extra_parameters = "+tf_mm_servermode 2"
+        else:
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} '\
+                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
+            extra_parameters = ''
+
+        srcds_run = '{path}/srcds_run {launch} {extra}' \
+                    .format(path=self.path['game'],
+                            launch=srcds_launch,
+                            extra=extra_parameters
+                           )
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
 
     def stop(self):
         """

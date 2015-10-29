@@ -182,22 +182,34 @@ if steam_appid == '740' and args.start:
     csgo.start()
 # TF2
 elif steam_appid == '232250' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    tf2 = TF2Server(gsconfig = gameserver)
+    tf2.start()
 # HL2DM
 elif steam_appid == '232370' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    hl2dm = HL2DMServer(gsconfig = gameserver)
+    hl2dm.start()
 # BMS
 elif steam_appid == '346680' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    bms = BMSServer(gsconfig = gameserver)
+    bms.start()
 # left4dead2
 elif steam_appid == '222860' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    l4d2 = L4D2Server(gsconfig = gameserver)
+    l4d2.start()
 # ARK
 elif steam_appid == '376030' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    ark = ARKServer(gsconfig = gameserver)
+    ark.start()
 # GSMOD
 elif steam_appid == '4020' and args.start:
-    pass
+    gameserver = load_configuration(CONFIG_FILE)
+    gsmod = GSModServer(gsconfig = gameserver)
+    gsmod.start()
 
 # Stop operations
 # CSGO

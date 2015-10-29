@@ -20,6 +20,7 @@ GAME = {
     '346680': 'bms',
     '222860': 'left4dead2',
     '376030': 'ShooterGame',
+    '4020': 'gsmod',
 }
 
 # Configuration parser variable. Don't touch this.

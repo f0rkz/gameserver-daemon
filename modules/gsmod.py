@@ -12,12 +12,23 @@ from modules.gameserver import GameServer
 parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '4020': 'gsmod',
+}
+
 class GSModServer(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def configure_list(self, group, options):
         """

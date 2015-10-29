@@ -12,12 +12,23 @@ from modules.gameserver import GameServer
 parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '222860': 'left4dead2',
+}
+
 class L4D2Server(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def configure_list(self, group, options):
         """
@@ -67,7 +78,27 @@ class L4D2Server(GameServer):
         return is_server_running
 
     def start(self):
-        pass
+        srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
+                           '+port {port} +ip {ip} +map {map}' \
+                           .format(game=GAME[steam_appid],
+                                   fork=self.gsconfig[steam_appid]['fork'],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map']
+                                  )
+        extra_parameters = ''
+        srcds_run = '{path}/srcds_run {launch} {extra}' \
+                    .format(path=self.path['game'],
+                            launch=srcds_launch,
+                            extra=extra_parameters
+                           )
+
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
 
     def stop(self):
         """
