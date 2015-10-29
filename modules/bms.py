@@ -75,6 +75,7 @@ class BMSServer(GameServer):
         return is_server_running
 
     def start(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
                            '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
                            '+port {port} +ip {ip} +map {map} +servercfgfile servercustom.cfg +sv_setsteamaccount {steamaccount}' \

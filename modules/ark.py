@@ -68,7 +68,25 @@ class ARKServer(GameServer):
         return is_server_running
 
     def start(self):
-        pass
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig[steam_appid]['serverpassword'] != 'ignore':
+                run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer ' \
+                               'TheIsland?Listen?SessionName={hostname}?ServerPassword={serverpassword}' \
+                               '?ServerAdminPassword={serveradminpassowrd}' \
+                               .format(gamedir=self.path['gamedir'],
+                                       hostname=self.gsconfig[steam_appid]['hostname'],
+                                       ServerPassowrd=self.gsconfig[steam_appid]['serverpassword'],
+                                       serveradminpassword=self.gsconfig[steam_appid]['serveradminpassword']
+                                      )
+        else:
+            run_commands = '{gamedir}/ShooterGame/Binaries/Linux/ShooterGameServer ' \
+                           'TheIsland?Listen?SessionName={hostname}?ServerAdminPassword={serveradminpassowrd}' \
+                           .format(gamedir=self.path['gamedir'],
+                                   hostname=self.gsconfig[steam_appid]['hostname'],
+                                   serveradminpassowrd=self.gsconfig[steam_appid]['serveradminpassword']
+                                  )
+        s = Screen(steam_appid, True)
+        s.send_commands(run_commands)
 
     def stop(self):
         """

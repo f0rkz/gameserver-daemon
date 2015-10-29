@@ -78,6 +78,7 @@ class L4D2Server(GameServer):
         return is_server_running
 
     def start(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate ' \
                            '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
                            '+port {port} +ip {ip} +map {map}' \

@@ -79,6 +79,7 @@ class TF2Server(GameServer):
         return is_server_running
 
     def start(self):
+        steam_appid = self.gsconfig['steamcmd']['appid']
         if self.gsconfig[steam_appid]['mvm'] == '1':
             srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
                            '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 '\
