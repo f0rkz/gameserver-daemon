@@ -12,6 +12,12 @@ from modules.gameserver import GameServer
 parser = ConfigParser.RawConfigParser()
 CONFIG_FILE = "server.conf"
 
+# Dictionary of game subdirectories for configuration
+# Also used for the game name in srcds launching
+GAME = {
+    '740': 'csgo',
+}
+
 class CSGOServer(GameServer):
     def __init__(self, gsconfig):
         # Bring the gsconfig and path variables over
