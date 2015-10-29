@@ -18,6 +18,11 @@ class CSGOServer(GameServer):
         super(GameServer, self).__init__()
         self.gsconfig = gsconfig
         self.steam_appid = self.gsconfig['steamcmd']['appid']
+        if self.gsconfig:
+            self.path = {
+                'steamcmd': os.path.join(self.gsconfig['steamcmd']['path'], ''),
+                'game': os.path.join(self.gsconfig['steamcmd']['path'], self.gsconfig['steamcmd']['appid']),
+            }
 
     def configure_list(self, group, options):
         """
@@ -76,7 +81,70 @@ class CSGOServer(GameServer):
         return is_server_running
 
     def start(self):
-        pass
+        """
+        Method to start the SRCDS gameserver.
+        There is a lot of customization going on here for each game.
+        """
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        # Figure out if there is a mapgroup to go with this launch.
+        if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
+                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} '\
+                               '-tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}' \
+                               .format(game=GAME[steam_appid],
+                                       steam_dir=self.path['steamcmd'],
+                                       runscript='runscript.txt',
+                                       maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                       tickrate=self.gsconfig[steam_appid]['tickrate'],
+                                       port=self.gsconfig[steam_appid]['port'],
+                                       ip=self.gsconfig[steam_appid]['ip'],
+                                       map=self.gsconfig[steam_appid]['map'],
+                                       mapgroup=self.gsconfig[steam_appid]['mapgroup'],
+                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                      )
+        else:
+            srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} ' \
+                           '-tickrate {tickrate} +port {port} +ip {ip} +map {map}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   tickrate=self.gsconfig[steam_appid]['tickrate'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
+        # Catch the gamemode and throw it as an extra launch option
+        if not self.gsconfig[steam_appid]['gamemode'] == 'none':
+                gamemode = self.gsconfig[steam_appid]['gamemode']
+
+                if gamemode == 'casual':
+                    extra_parameters = "+game_type 0 +game_mode 0"
+
+                elif gamemode == 'competitive':
+                    extra_parameters = "+game_type 0 +game_mode 1"
+
+                elif gamemode == 'armsrace':
+                    extra_parameters = "+game_type 1 +game_mode 0"
+
+                elif gamemode == 'demolition':
+                    extra_parameters = "+game_type 1 +game_mode 1"
+
+                elif gamemode == 'deathmatch':
+                    extra_parameters = "+game_type 1 +game_mode 2"
+            else:
+                gamemode_launch = ''
+
+        # Form up the SRCDS launch command
+        srcds_run = '{path}/srcds_run {launch} {extra}' \
+                    .format(path=self.path['game'],
+                            launch=srcds_launch,
+                            extra=extra_parameters
+                           )
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
 
     def stop(self):
         """
