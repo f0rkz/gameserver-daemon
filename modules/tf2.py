@@ -56,6 +56,7 @@ class TF2Server(GameServer):
         config_options =  [
             {'option': 'mvm', 'info': 'Mann Versus Machine: [0] ', 'default': '0'},
             {'option': 'timelimit', 'info': 'mp_timelimit: [40] ', 'default': '40'},
+            {'option': 'maxrounds', 'info': 'mp_maxrounds: [5] ', 'default': '5'},
             {'option': 'winlimit', 'info': 'mp_winlimit: [0] ', 'default': '0'},
             {'option': 'overtime_nag', 'info': 'tf_overtime_nag: [0] ', 'default': '0'},
             {'option': 'tf_mm_servermode', 'info': 'tf_mm_servermode [1] ', 'default': '1', 'valid_option': ['0', '1', '2']},
