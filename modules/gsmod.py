@@ -97,6 +97,8 @@ class GSModServer(GameServer):
                                    map=self.gsconfig[steam_appid]['map'],
                                    steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'],
                                    workshop=self.gsconfig[steam_appid]['workshop'],
+                                   gamemode=self.gsconfig[steam_appid]['gamemode'],
+                                   authkey=self.gsconfig['steamcmd']['steamapi'],
                                   )
             extra_parameters = ''
         else:
