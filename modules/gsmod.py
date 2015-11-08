@@ -53,7 +53,15 @@ class GSModServer(GameServer):
             parser.set(group['id'], config_object['option'], group[config_object['option']])
 
     def configure(self):
-        pass
+        config_options =  [
+            {'option': 'workshop', 'info': 'Workshop collection ID: ', 'default': '0'},
+            {'option': 'gamemode', 'info': 'Desired Gamemode: [none] ', 'default': 'ignore'},
+        ]
+        parser.read(CONFIG_FILE)
+        myid = {'id': self.steam_appid}
+        self.configure_list(myid,config_options)
+        parser.write(open(CONFIG_FILE, 'w'))
+        print "Configuration saved as {}".format(CONFIG_FILE)
 
     def status(self):
         """
@@ -65,7 +73,61 @@ class GSModServer(GameServer):
         return is_server_running
 
     def start(self):
-        pass
+        steam_appid = self.gsconfig['steamcmd']['appid']
+        # Steamapi key provided, check for workshop content
+        if self.gsconfig['steamcmd']['steamapi'] != 'ignore' and self.gsconfig[steam_appid]['workshop'] != 'ignore':
+            srcds_launch = '-game {game} ' \
+                           '-console -usercon -secure -autoupdate '\
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} '\
+                           '-maxplayers {maxplayers} '\
+                           '+port {port} '\
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+sv_setsteamaccount {steamaccount} ' \
+                           '+gamemode {gamemode} ' \
+                           '+host_workshop_collection {workshop} ' \
+                           '-authkey {authkey}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'],
+                                   workshop=self.gsconfig[steam_appid]['workshop'],
+                                  )
+            extra_parameters = ''
+        else:
+            srcds_launch = '-game {game} ' \
+                           '-console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers {maxplayers} ' \
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+sv_setsteamaccount {steamaccount}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
+            extra_parameters = ''
+
+        srcds_run = '{path}/srcds_run {launch} {extra}' \
+                    .format(path=self.path['game'],
+                            launch=srcds_launch,
+                            extra=extra_parameters
+                           )
+        s = Screen(steam_appid, True)
+        s.send_commands(srcds_run)
+
 
     def stop(self):
         """

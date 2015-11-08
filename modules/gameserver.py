@@ -68,7 +68,8 @@ class GameServer(object):
             {'option': 'password', 'info': 'Steam password: [anonymous] ', 'default': 'anonymous'},
             {'option': 'path', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
             {'option': 'appid', 'info': 'Steam AppID: '},
-            {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']}
+            {'option': 'steamapi', 'info': 'Steam API Key (for workshop content) [none] ', 'default': 'ignore'},
+            {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']},
         ]
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
