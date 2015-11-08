@@ -15,7 +15,7 @@ CONFIG_FILE = "server.conf"
 # Dictionary of game subdirectories for configuration
 # Also used for the game name in srcds launching
 GAME = {
-    '4020': 'gsmod',
+    '4020': 'garrysmod',
 }
 
 class GSModServer(GameServer):
