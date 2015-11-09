@@ -54,6 +54,7 @@ There are a select group of games currently supported by the script.
 - hl2mp: APPID 232370
 - bms: APPID 346680
 - left4dead2: APPID 222860
+- garrysmod: APPID 4020
 - ARK Survival Evolved: APPID 376030
 
 More games are planned for the future. To properly set your server up, use one of the above (for the game you are planning on running.)
