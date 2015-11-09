@@ -79,18 +79,25 @@ class L4D2Server(GameServer):
 
     def start(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
-        srcds_launch = '-game {game} -console -usercon -fork {fork} -secure -autoupdate ' \
-                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
-                           '+port {port} +ip {ip} +map {map}' \
-                           .format(game=GAME[steam_appid],
-                                   fork=self.gsconfig[steam_appid]['fork'],
-                                   steam_dir=self.path['steamcmd'],
-                                   runscript='runscript.txt',
-                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
-                                   port=self.gsconfig[steam_appid]['port'],
-                                   ip=self.gsconfig[steam_appid]['ip'],
-                                   map=self.gsconfig[steam_appid]['map']
-                                  )
+        srcds_launch = '-game {game} ' \
+                       '-console -usercon ' \
+                       '-fork {fork} ' \
+                       '-secure -autoupdate ' \
+                       '-steam_dir {steam_dir} ' \
+                       '-steamcmd_script {runscript} ' \
+                       '-maxplayers {maxplayers} ' \
+                       '+port {port} ' \
+                       '+ip {ip} ' \
+                       '+map {map}' \
+                       .format(game=GAME[steam_appid],
+                               fork=self.gsconfig[steam_appid]['fork'],
+                               steam_dir=self.path['steamcmd'],
+                               runscript='runscript.txt',
+                               maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                               port=self.gsconfig[steam_appid]['port'],
+                               ip=self.gsconfig[steam_appid]['ip'],
+                               map=self.gsconfig[steam_appid]['map']
+                              )
         extra_parameters = ''
         srcds_run = '{path}/srcds_run {launch} {extra}' \
                     .format(path=self.path['game'],

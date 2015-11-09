@@ -76,8 +76,13 @@ class HL2DMServer(GameServer):
     def start(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
         srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
-                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} ' \
-                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers {maxplayers} ' \
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+sv_setsteamaccount {steamaccount}' \
                            .format(game=GAME[steam_appid],
                                    steam_dir=self.path['steamcmd'],
                                    runscript='runscript.txt',

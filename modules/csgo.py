@@ -94,24 +94,37 @@ class CSGOServer(GameServer):
         steam_appid = self.gsconfig['steamcmd']['appid']
         # Figure out if there is a mapgroup to go with this launch.
         if not self.gsconfig[steam_appid]['mapgroup'] == 'none':
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
-                               '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} '\
-                               '-tickrate {tickrate} +port {port} +ip {ip} +map {map} +mapgroup {mapgroup}' \
-                               .format(game=GAME[steam_appid],
-                                       steam_dir=self.path['steamcmd'],
-                                       runscript='runscript.txt',
-                                       maxplayers=self.gsconfig[steam_appid]['maxplayers'],
-                                       tickrate=self.gsconfig[steam_appid]['tickrate'],
-                                       port=self.gsconfig[steam_appid]['port'],
-                                       ip=self.gsconfig[steam_appid]['ip'],
-                                       map=self.gsconfig[steam_appid]['map'],
-                                       mapgroup=self.gsconfig[steam_appid]['mapgroup'],
-                                       steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
-                                      )
+            srcds_launch = '-game {game} ' \
+                           ' -console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers_override {maxplayers} ' \
+                           '-tickrate {tickrate} ' \
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+mapgroup {mapgroup}' \
+                           .format(game=GAME[steam_appid],
+                                   steam_dir=self.path['steamcmd'],
+                                   runscript='runscript.txt',
+                                   maxplayers=self.gsconfig[steam_appid]['maxplayers'],
+                                   tickrate=self.gsconfig[steam_appid]['tickrate'],
+                                   port=self.gsconfig[steam_appid]['port'],
+                                   ip=self.gsconfig[steam_appid]['ip'],
+                                   map=self.gsconfig[steam_appid]['map'],
+                                   mapgroup=self.gsconfig[steam_appid]['mapgroup'],
+                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
+                                  )
         else:
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate ' \
-                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers_override {maxplayers} ' \
-                           '-tickrate {tickrate} +port {port} +ip {ip} +map {map}' \
+            srcds_launch = '-game {game} ' \
+                           '-console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers_override {maxplayers} ' \
+                           '-tickrate {tickrate} ' \
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map}' \
                            .format(game=GAME[steam_appid],
                                    steam_dir=self.path['steamcmd'],
                                    runscript='runscript.txt',

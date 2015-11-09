@@ -102,8 +102,12 @@ class GameServer(object):
         """
         Method to update game files with the validate option
         """
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
-                       ' +force_install_dir {installdir} +app_update {id} validate +quit' \
+        steamcmd_run = '{steamcmdpath}steamcmd.sh ' \
+                       '+login {login} {password} ' \
+                       '+force_install_dir {installdir} ' \
+                       '+app_update {id} ' \
+                       'validate ' \
+                       '+quit' \
                        .format(steamcmdpath=self.path['steamcmd'],
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
@@ -116,12 +120,36 @@ class GameServer(object):
         """
         Method to update game files without the validate option
         """
-        steamcmd_run = '{steamcmdpath}steamcmd.sh +login {login} {password}' \
-                       ' +force_install_dir {installdir} +app_update {id} +quit' \
+        steamcmd_run = '{steamcmdpath}steamcmd.sh ' \
+                       '+login {login} {password} ' \
+                       '+force_install_dir {installdir} ' \
+                       '+app_update {id} '\
+                       '+quit' \
                        .format(steamcmdpath=self.path['steamcmd'],
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
                                installdir=self.path['game'],
                                id=self.gsconfig['steamcmd']['appid']
+                              )
+        subprocess.call(steamcmd_run, shell=True)
+
+    def install_content(self, gameid, path):
+        """
+        Installs content for a game. Doesn't care about the content.
+        This is useful for installing garry's mod content
+        """
+        #
+        # make the content directory
+
+        steamcmd_run = '{steamcmdpath}steamcmd.sh ' \
+                       '+login {login} {password} ' \
+                       '+force_install_dir {installdir} ' \
+                       '+app_update {id} ' \
+                       '+quit' \
+                       .format(steamcmdpath=self.path['steamcmd'],
+                               login=self.gsconfig['steamcmd']['user'],
+                               password=self.gsconfig['steamcmd']['password'],
+                               installdir=path,
+                               id=gameid
                               )
         subprocess.call(steamcmd_run, shell=True)

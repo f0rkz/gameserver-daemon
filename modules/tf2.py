@@ -82,9 +82,15 @@ class TF2Server(GameServer):
     def start(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
         if self.gsconfig[steam_appid]['mvm'] == '1':
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
-                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers 32 '\
-                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+            srcds_launch = '-game {game} ' \
+                           '-console -usercon -secure -autoupdate '\
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers 32 '\
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+sv_setsteamaccount {steamaccount}' \
                            .format(game=GAME[steam_appid],
                                    steam_dir=self.path['steamcmd'],
                                    runscript='runscript.txt',
@@ -95,9 +101,15 @@ class TF2Server(GameServer):
                                   )
             extra_parameters = "+tf_mm_servermode 2"
         else:
-            srcds_launch = '-game {game} -console -usercon -secure -autoupdate '\
-                           '-steam_dir {steam_dir} -steamcmd_script {runscript} -maxplayers {maxplayers} '\
-                           '+port {port} +ip {ip} +map {map} +sv_setsteamaccount {steamaccount}' \
+            srcds_launch = '-game {game} ' \
+                           '-console -usercon -secure -autoupdate ' \
+                           '-steam_dir {steam_dir} ' \
+                           '-steamcmd_script {runscript} ' \
+                           '-maxplayers {maxplayers} ' \
+                           '+port {port} ' \
+                           '+ip {ip} ' \
+                           '+map {map} ' \
+                           '+sv_setsteamaccount {steamaccount}' \
                            .format(game=GAME[steam_appid],
                                    steam_dir=self.path['steamcmd'],
                                    runscript='runscript.txt',
