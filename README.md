@@ -16,7 +16,7 @@ everything in between.
 
 - Step 2: Install lib32gcc1 (a dependancy required for steamcmd and srcds based servers)
 
-`sudo apt-get install lib32gcc1`
+`sudo apt-get install lib32gcc1 lib32stdc++6`
 
 * For other distributions, find the proper lib32gcc1 package and install it.
 
