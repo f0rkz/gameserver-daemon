@@ -89,7 +89,7 @@ if os.path.isfile(CONFIG_FILE) and args.configure:
 
 if os.path.isfile(CONFIG_FILE) and args.installcontent:
     install_files = GameServer(gsconfig = gameserver)
-    intall_files.install_content()
+    install_files.install_content()
 
 if not os.path.isfile(CONFIG_FILE) and args.configure:
     base_config = GameServer(gsconfig = gameserver)
