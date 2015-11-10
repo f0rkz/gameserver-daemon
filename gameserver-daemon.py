@@ -50,7 +50,7 @@ argparser = argparse.ArgumentParser(description="f0rkz gameserver daemon. Used t
 if steam_appid:
     # Basic shared items
     argparser.add_argument("--configure", help="Run the configuration tool and exit.", action="store_true")
-    argparser.add_argument("--install-content", help="Install a game's content. Example: --install-content", action="store_true")
+    argparser.add_argument("--install-content", help="Install a game's content.", action="store_true")
     argparser.add_argument("-u", "--update", help="Update the gameserver files.", action="store_true")
     argparser.add_argument("--validate", help="Use the validate switch for steamcmd. This will update the game if no other options are set.", action="store_true")
     argparser.add_argument("--steamcmd", help="Install steamcmd to the configured directory.", action="store_true")
@@ -86,6 +86,10 @@ if os.path.isfile(CONFIG_FILE) and args.configure:
         subprocess.call("rm {}".format(CONFIG_FILE), shell=True)
     else:
         sys.exit("Configuration will not be removed. Exiting.")
+
+if os.path.isfile(CONFIG_FILE) and args.install-content:
+    install_files = GameServer(gsconfig = gameserver)
+    intall_files.install_content()
 
 if not os.path.isfile(CONFIG_FILE) and args.configure:
     base_config = GameServer(gsconfig = gameserver)

@@ -133,13 +133,24 @@ class GameServer(object):
                               )
         subprocess.call(steamcmd_run, shell=True)
 
-    def install_content(self, gameid, path):
+    def install_content(self):
         """
         Installs content for a game. Doesn't care about the content.
         This is useful for installing garry's mod content
         """
-        #
-        # make the content directory
+        # Query the user for information regarding the content install
+        while True:
+            path = raw_input('Content path: ')
+            if path:
+                if os.path.exists(path):
+                    break
+                else:
+                    os.makedirs(path)
+                    break
+        while True:
+            appid = raw_input('Steam APPID: ')
+            if appid:
+                break
 
         steamcmd_run = '{steamcmdpath}steamcmd.sh ' \
                        '+login {login} {password} ' \
@@ -150,6 +161,6 @@ class GameServer(object):
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
                                installdir=path,
-                               id=gameid
+                               id=appid
                               )
         subprocess.call(steamcmd_run, shell=True)
