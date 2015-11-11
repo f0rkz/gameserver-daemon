@@ -37,6 +37,7 @@ if os.path.isfile(CONFIG_FILE):
     gameserver = load_configuration(CONFIG_FILE)
     steam_appid = gameserver['steamcmd']['appid']
     steamcmd_path = gameserver['steamcmd']['path']
+    gamedir = os.path.join(steamcmd_path, steam_appid)
     engine = gameserver['steamcmd']['engine']
 else:
     gameserver = False
@@ -172,7 +173,7 @@ if os.path.isfile(CONFIG_FILE) and args.update:
 # server.cfg, motd, runscript, etc...
 # --------------------------------------------
 # This should clear up the errors we see in Issue #3
-if engine == 'srcds' and os.path.isdir(steamcmd_path):
+if engine == 'srcds' and os.path.isdir(steamcmd_path) and os.path.isdir(gamedir):
     # MOTD
     if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.motd:
         gameserver = load_configuration(CONFIG_FILE)
@@ -196,7 +197,7 @@ if engine == 'srcds' and os.path.isdir(steamcmd_path):
 # Start, stop, restart, etc.
 # --------------------------------------------
 # Start operations
-if engine == 'srcds' or engine == 'unreal' and os.path.isdir(steamcmd_path):
+if engine == 'srcds' or engine == 'unreal' and os.path.isdir(steamcmd_path) and os.path.isdir(gamedir):
     # CSGO
     if steam_appid == '740' and args.start:
         gameserver = load_configuration(CONFIG_FILE)
