@@ -173,144 +173,152 @@ if os.path.isfile(CONFIG_FILE) and args.update:
 # server.cfg, motd, runscript, etc...
 # --------------------------------------------
 # This should clear up the errors we see in Issue #3
-if engine == 'srcds' and os.path.isdir(steamcmd_path) and os.path.isdir(gamedir):
-    # MOTD
-    if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.motd:
-        gameserver = load_configuration(CONFIG_FILE)
-        motd = SRCDS(gsconfig = gameserver)
-        motd.create_motd()
+if engine == 'srcds' and os.path.isdir(steamcmd_path):
+    # Check if the game is installed before running these.
+    if os.path.isdir(gamedir):
+        # MOTD
+        if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.motd:
+            gameserver = load_configuration(CONFIG_FILE)
+            motd = SRCDS(gsconfig = gameserver)
+            motd.create_motd()
 
-    # Runscript creation
-    if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.runscript:
-        gameserver = load_configuration(CONFIG_FILE)
-        runscript = SRCDS(gsconfig = gameserver)
-        runscript.create_runscript()
+        # Runscript creation
+        if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.runscript:
+            gameserver = load_configuration(CONFIG_FILE)
+            runscript = SRCDS(gsconfig = gameserver)
+            runscript.create_runscript()
 
-    # Server.cfg creation
-    if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
-        gameserver = load_configuration(CONFIG_FILE)
-        servercfg = SRCDS(gsconfig = gameserver)
-        servercfg.create_servercfg()
+        # Server.cfg creation
+        if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
+            gameserver = load_configuration(CONFIG_FILE)
+            servercfg = SRCDS(gsconfig = gameserver)
+            servercfg.create_servercfg()
+    else:
+        sys.exit("Game is not installed. Use the --update command to install the game files.")
 
 # --------------------------------------------
 # Server related operations
 # Start, stop, restart, etc.
 # --------------------------------------------
 # Start operations
-if engine == 'srcds' or engine == 'unreal' and os.path.isdir(steamcmd_path) and os.path.isdir(gamedir):
-    # CSGO
-    if steam_appid == '740' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        csgo = CSGOServer(gsconfig = gameserver)
-        csgo.start()
-    # TF2
-    elif steam_appid == '232250' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        tf2 = TF2Server(gsconfig = gameserver)
-        tf2.start()
-    # HL2DM
-    elif steam_appid == '232370' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        hl2dm = HL2DMServer(gsconfig = gameserver)
-        hl2dm.start()
-    # BMS
-    elif steam_appid == '346680' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        bms = BMSServer(gsconfig = gameserver)
-        bms.start()
-    # left4dead2
-    elif steam_appid == '222860' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        l4d2 = L4D2Server(gsconfig = gameserver)
-        l4d2.start()
-    # ARK
-    elif steam_appid == '376030' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        ark = ARKServer(gsconfig = gameserver)
-        ark.start()
-    # GSMOD
-    elif steam_appid == '4020' and args.start:
-        gameserver = load_configuration(CONFIG_FILE)
-        gsmod = GSModServer(gsconfig = gameserver)
-        gsmod.start()
+if engine == 'srcds' or engine == 'unreal' and os.path.isdir(steamcmd_path):
+    # Check if the game is installed
+    if os.path.isdir(gamedir):
+        # CSGO
+        if steam_appid == '740' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            csgo = CSGOServer(gsconfig = gameserver)
+            csgo.start()
+        # TF2
+        elif steam_appid == '232250' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            tf2 = TF2Server(gsconfig = gameserver)
+            tf2.start()
+        # HL2DM
+        elif steam_appid == '232370' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            hl2dm = HL2DMServer(gsconfig = gameserver)
+            hl2dm.start()
+        # BMS
+        elif steam_appid == '346680' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            bms = BMSServer(gsconfig = gameserver)
+            bms.start()
+        # left4dead2
+        elif steam_appid == '222860' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            l4d2 = L4D2Server(gsconfig = gameserver)
+            l4d2.start()
+        # ARK
+        elif steam_appid == '376030' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            ark = ARKServer(gsconfig = gameserver)
+            ark.start()
+        # GSMOD
+        elif steam_appid == '4020' and args.start:
+            gameserver = load_configuration(CONFIG_FILE)
+            gsmod = GSModServer(gsconfig = gameserver)
+            gsmod.start()
 
-    # Stop operations
-    # CSGO
-    if steam_appid == '740' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        csgo = CSGOServer(gsconfig = gameserver)
-        csgo.stop()
-    # TF2
-    elif steam_appid == '232250' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        tf2 = TF2Server(gsconfig = gameserver)
-        tf2.stop()
-    # HL2DM
-    elif steam_appid == '232370' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        hl2dm = HL2DMServer(gsconfig = gameserver)
-        hl2dm.stop()
-    # BMS
-    elif steam_appid == '346680' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        bms = BMSServer(gsconfig = gameserver)
-        bms.stop()
-    # left4dead2
-    elif steam_appid == '222860' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        l4d2 = L4D2Server(gsconfig = gameserver)
-        l4d2.stop()
-    # ARK
-    elif steam_appid == '376030' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        ark = ARKServer(gsconfig = gameserver)
-        ark.stop()
-    # GSMOD
-    elif steam_appid == '4020' and args.stop:
-        gameserver = load_configuration(CONFIG_FILE)
-        gsmod = GSModServer(gsconfig = gameserver)
-        gsmod.stop()
+        # Stop operations
+        # CSGO
+        if steam_appid == '740' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            csgo = CSGOServer(gsconfig = gameserver)
+            csgo.stop()
+        # TF2
+        elif steam_appid == '232250' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            tf2 = TF2Server(gsconfig = gameserver)
+            tf2.stop()
+        # HL2DM
+        elif steam_appid == '232370' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            hl2dm = HL2DMServer(gsconfig = gameserver)
+            hl2dm.stop()
+        # BMS
+        elif steam_appid == '346680' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            bms = BMSServer(gsconfig = gameserver)
+            bms.stop()
+        # left4dead2
+        elif steam_appid == '222860' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            l4d2 = L4D2Server(gsconfig = gameserver)
+            l4d2.stop()
+        # ARK
+        elif steam_appid == '376030' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            ark = ARKServer(gsconfig = gameserver)
+            ark.stop()
+        # GSMOD
+        elif steam_appid == '4020' and args.stop:
+            gameserver = load_configuration(CONFIG_FILE)
+            gsmod = GSModServer(gsconfig = gameserver)
+            gsmod.stop()
 
-    # Restart operations
-    # CSGO
-    if steam_appid == '740' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        csgo = CSGOServer(gsconfig = gameserver)
-        csgo.stop()
-        csgo.start()
-    # TF2
-    elif steam_appid == '232250' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        tf2 = TF2Server(gsconfig = gameserver)
-        tf2.stop()
-        tf2.start()
-    # HL2DM
-    elif steam_appid == '232370' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        hl2dm = HL2DMServer(gsconfig = gameserver)
-        hl2dm.stop()
-        hl2dm.start()
-    # BMS
-    elif steam_appid == '346680' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        bms = BMSServer(gsconfig = gameserver)
-        bms.stop()
-        bms.start()
-    # left4dead2
-    elif steam_appid == '222860' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        l4d2 = L4D2Server(gsconfig = gameserver)
-        l4d2.stop()
-        l4d2.start()
-    # ARK
-    elif steam_appid == '376030' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        ark = ARKServer(gsconfig = gameserver)
-        ark.stop()
-        ark.start()
-    # GSMOD
-    elif steam_appid == '4020' and args.restart:
-        gameserver = load_configuration(CONFIG_FILE)
-        gsmod = GSModServer(gsconfig = gameserver)
-        gsmod.stop()
-        gsmod.start()
+        # Restart operations
+        # CSGO
+        if steam_appid == '740' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            csgo = CSGOServer(gsconfig = gameserver)
+            csgo.stop()
+            csgo.start()
+        # TF2
+        elif steam_appid == '232250' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            tf2 = TF2Server(gsconfig = gameserver)
+            tf2.stop()
+            tf2.start()
+        # HL2DM
+        elif steam_appid == '232370' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            hl2dm = HL2DMServer(gsconfig = gameserver)
+            hl2dm.stop()
+            hl2dm.start()
+        # BMS
+        elif steam_appid == '346680' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            bms = BMSServer(gsconfig = gameserver)
+            bms.stop()
+            bms.start()
+        # left4dead2
+        elif steam_appid == '222860' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            l4d2 = L4D2Server(gsconfig = gameserver)
+            l4d2.stop()
+            l4d2.start()
+        # ARK
+        elif steam_appid == '376030' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            ark = ARKServer(gsconfig = gameserver)
+            ark.stop()
+            ark.start()
+        # GSMOD
+        elif steam_appid == '4020' and args.restart:
+            gameserver = load_configuration(CONFIG_FILE)
+            gsmod = GSModServer(gsconfig = gameserver)
+            gsmod.stop()
+            gsmod.start()
+    else:
+        sys.exit("Game is not installed. Use the --update command to install the game files.")
