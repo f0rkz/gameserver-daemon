@@ -57,7 +57,7 @@ if steam_appid:
     argparser.add_argument("--steamcmd", help="Install steamcmd to the configured directory.", action="store_true")
 
     # Begin loading each option for the configured game
-    if engine == 'srcds' and os.path.isdir(steamcmd_path):
+    if engine == 'srcds':
         # Stuff for srcds
         argparser.add_argument("--runscript", help="Generate the runscript.txt file.", action="store_true")
         argparser.add_argument("--servercfg", help="Generate the server.cfg file", action="store_true")
@@ -65,7 +65,7 @@ if steam_appid:
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
         argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
-    if engine == 'unreal' and os.path.isdir(steamcmd_path):
+    if engine == 'unreal':
         # Stuff for unreal
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
