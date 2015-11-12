@@ -342,5 +342,5 @@ try:
                 gsmod.start()
         else:
             sys.exit("Game is not installed. Use the --update command to install the game files.")
-except AttributeError:
+except (AttributeError, NameError):
     pass
