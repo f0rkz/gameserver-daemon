@@ -133,4 +133,11 @@ If you run the --configure line, you should see your new cvar.
 
 # Questions?
 
-Email me (f0rkz@f0rkznet.net) or create a new issue. I use this script heavily for my gameservers so any problems or extensibilites are gladly accepted!
+Q: Help I get this error:
+  f7lans@prophunt:~/gameserver-daemon$ python gameserver-daemon.py --update
+  /home/f7lans/prophunt.f7lans.com/steamcmd.sh: line 29: /home/f7lans/prophunt.f7lans.com/linux32/steamcmd: No such file or directory
+  Game is not installed. Use the --update command to install the game files.
+A: Read those directions! You are missing the lib32gcc1 dependency
+
+
+Email me (f0rkz@f0rkznet.net) or create a new issue. I use this script heavily for my gameservers so any problems or extensibilities are gladly accepted!
