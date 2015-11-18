@@ -111,7 +111,7 @@ class GameServer(object):
                        .format(steamcmdpath=self.path['steamcmd'],
                                login=self.gsconfig['steamcmd']['user'],
                                password=self.gsconfig['steamcmd']['password'],
-                               installdir=self.path['gamedir'],
+                               installdir=self.path['game'],
                                id=self.gsconfig['steamcmd']['appid']
                               )
         subprocess.call(steamcmd_run, shell=True)
