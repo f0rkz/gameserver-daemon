@@ -84,7 +84,6 @@ class GSModServer(GameServer):
                            '+port {port} '\
                            '+ip {ip} ' \
                            '+map {map} ' \
-                           '+sv_setsteamaccount {steamaccount} ' \
                            '+gamemode {gamemode} ' \
                            '+host_workshop_collection {workshop} ' \
                            '-authkey {authkey}' \
@@ -95,7 +94,6 @@ class GSModServer(GameServer):
                                    port=self.gsconfig[steam_appid]['port'],
                                    ip=self.gsconfig[steam_appid]['ip'],
                                    map=self.gsconfig[steam_appid]['map'],
-                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount'],
                                    workshop=self.gsconfig[steam_appid]['workshop'],
                                    gamemode=self.gsconfig[steam_appid]['gamemode'],
                                    authkey=self.gsconfig['steamcmd']['steamapi'],
@@ -110,7 +108,6 @@ class GSModServer(GameServer):
                            '+port {port} ' \
                            '+ip {ip} ' \
                            '+map {map} ' \
-                           '+sv_setsteamaccount {steamaccount}' \
                            .format(game=GAME[steam_appid],
                                    steam_dir=self.path['steamcmd'],
                                    runscript='runscript.txt',
@@ -118,7 +115,6 @@ class GSModServer(GameServer):
                                    port=self.gsconfig[steam_appid]['port'],
                                    ip=self.gsconfig[steam_appid]['ip'],
                                    map=self.gsconfig[steam_appid]['map'],
-                                   steamaccount=self.gsconfig[steam_appid]['sv_setsteamaccount']
                                   )
             extra_parameters = ''
 
