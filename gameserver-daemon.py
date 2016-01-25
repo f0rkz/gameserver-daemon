@@ -158,6 +158,7 @@ try:
             game_config = GSModServer(gsconfig = gameserver)
             game_config.configure()
 
+        # SvenCoopServer
         elif steam_appid == '276060':
             game_config = SvenCoopServer(gsconfig = gameserver)
             game_config.configure()
@@ -221,11 +222,19 @@ try:
                 gameserver = load_configuration(CONFIG_FILE)
                 runscript = SRCDS(gsconfig = gameserver)
                 runscript.create_runscript()
+            elif os.path.isfile(CONFIG_FILE) and engine == 'hlds' and args.runscript:
+                gameserver = load_configuration(CONFIG_FILE)
+                runscript = HLDS(gsconfig = gameserver)
+                runscript.create_runscript()
 
             # Server.cfg creation
             if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
                 gameserver = load_configuration(CONFIG_FILE)
                 servercfg = SRCDS(gsconfig = gameserver)
+                servercfg.create_servercfg()
+            elif os.path.isfile(CONFIG_FILE) and engine == 'hlds' and args.servercfg:
+                gameserver = load_configuration(CONFIG_FILE)
+                servercfg = HLDS(gsconfig = gameserver)
                 servercfg.create_servercfg()
         else:
             sys.exit("Game is not installed. Use the --update command to install the game files.")
