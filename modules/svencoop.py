@@ -56,6 +56,7 @@ class SvenCoopServer(GameServer):
     def configure(self):
         # {'option': '', 'info': ' ', 'default': ''},
         config_options = [
+            {'option': 'skill', 'info': 'skill [0-3] ', 'default': '0'},
             {'option': 'mp_allowmonsterinfo', 'info': 'mp_allowmonsterinfo [1] ', 'default': '1'},
             {'option': 'mp_banana', 'info': 'mp_banana [1] ', 'default': '1'},
             {'option': 'mp_chattime', 'info': 'mp_chattime [8] ', 'default': '8'},
