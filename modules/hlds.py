@@ -158,7 +158,7 @@ class HLDS(GameServer):
 
             # svencoop support
             if appid == '276060':
-                with open(os.path.join(self.path['game'],GAME[appid],'svencoop','server.cfg'), "wb") as outfile:
+                with open(os.path.join(self.path['game'],GAME[appid],'server.cfg'), "wb") as outfile:
                     outfile.write(output)
             else:
                 with open(os.path.join(self.path['game'],GAME[appid],'cfg','server.cfg'), "wb") as outfile:
