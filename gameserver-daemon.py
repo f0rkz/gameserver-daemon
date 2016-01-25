@@ -157,6 +157,7 @@ try:
         elif steam_appid == '4020':
             game_config = GSModServer(gsconfig = gameserver)
             game_config.configure()
+
         elif steam_appid == '276060':
             game_config = SvenCoopServer(gsconfig = gameserver)
             game_config.configure()
@@ -320,7 +321,7 @@ try:
                 gsmod.stop()
 
             # SvenCoop
-            elif steam_appid == '276060' and args.start:
+            elif steam_appid == '276060' and args.stop:
                 gameserver = load_configuration(CONFIG_FILE)
                 svencoop = SvenCoopServer(gsconfig = gameserver)
                 svencoop.stop()
