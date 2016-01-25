@@ -105,7 +105,6 @@ class SvenCoopServer(GameServer):
                        '+ip {ip} ' \
                        '+map {map}' \
                        .format(game=GAME[steam_appid],
-                               fork=self.gsconfig[steam_appid]['fork'],
                                steam_dir=self.path['steamcmd'],
                                runscript='runscript.txt',
                                maxplayers=self.gsconfig[steam_appid]['maxplayers'],
