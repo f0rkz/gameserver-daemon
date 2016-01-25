@@ -8,6 +8,7 @@ import subprocess
 # Base modules
 from modules.gameserver import GameServer
 from modules.srcds import SRCDS
+from modules.hlds import HLDS
 from modules.unreal import Unreal
 
 # Game specific modules
@@ -18,6 +19,7 @@ from modules.gsmod import GSModServer
 from modules.hl2dm import HL2DMServer
 from modules.l4d2 import L4D2Server
 from modules.tf2 import TF2Server
+from modules.svencoop import SvenCoopServer
 
 # The server.conf file name.
 # Change this if you want things to break.
@@ -62,6 +64,13 @@ if steam_appid:
         argparser.add_argument("--runscript", help="Generate the runscript.txt file.", action="store_true")
         argparser.add_argument("--servercfg", help="Generate the server.cfg file", action="store_true")
         argparser.add_argument("--motd", help="Generate the motd.txt", action="store_true")
+        argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
+        argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
+        argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
+    if engine == 'hlds':
+        # Stuff for hlds
+        argparser.add_argument("--runscript", help="Generate the runscript.txt file.", action="store_true")
+        argparser.add_argument("--servercfg", help="Generate the server.cfg file", action="store_true")
         argparser.add_argument("--start", help="Start the gameserver.", action="store_true")
         argparser.add_argument("--stop", help="Stop the gameserver.", action="store_true")
         argparser.add_argument("--restart", help="Restart the gameserver.", action="store_true")
@@ -110,6 +119,10 @@ try:
             engine_config = SRCDS(gsconfig = gameserver)
             engine_config.configure()
 
+        elif engine == 'hlds':
+            engine_config = HLDS(gsconfig = gameserver)
+            engine_config.configure()
+
         # Unreal configuration
         elif engine == 'unreal':
             engine_config = Unreal(gsconfig = gameserver)
@@ -143,6 +156,11 @@ try:
         # GSMOD
         elif steam_appid == '4020':
             game_config = GSModServer(gsconfig = gameserver)
+            game_config.configure()
+
+        # SvenCoopServer
+        elif steam_appid == '276060':
+            game_config = SvenCoopServer(gsconfig = gameserver)
             game_config.configure()
 except AttributeError:
     pass
@@ -190,7 +208,7 @@ except AttributeError:
 # server.cfg, motd, runscript, etc...
 # --------------------------------------------
 try:
-    if engine == 'srcds' and os.path.isdir(steamcmd_path):
+    if engine == 'srcds' or engine == 'hlds' and os.path.isdir(steamcmd_path):
         # Check if the game is installed before running these.
         if os.path.isdir(gamedir):
             # MOTD
@@ -204,11 +222,19 @@ try:
                 gameserver = load_configuration(CONFIG_FILE)
                 runscript = SRCDS(gsconfig = gameserver)
                 runscript.create_runscript()
+            elif os.path.isfile(CONFIG_FILE) and engine == 'hlds' and args.runscript:
+                gameserver = load_configuration(CONFIG_FILE)
+                runscript = HLDS(gsconfig = gameserver)
+                runscript.create_runscript()
 
             # Server.cfg creation
             if os.path.isfile(CONFIG_FILE) and engine == 'srcds' and args.servercfg:
                 gameserver = load_configuration(CONFIG_FILE)
                 servercfg = SRCDS(gsconfig = gameserver)
+                servercfg.create_servercfg()
+            elif os.path.isfile(CONFIG_FILE) and engine == 'hlds' and args.servercfg:
+                gameserver = load_configuration(CONFIG_FILE)
+                servercfg = HLDS(gsconfig = gameserver)
                 servercfg.create_servercfg()
         else:
             sys.exit("Game is not installed. Use the --update command to install the game files.")
@@ -221,7 +247,7 @@ except AttributeError:
 # --------------------------------------------
 # Start operations
 try:
-    if engine == 'srcds' or engine == 'unreal' and os.path.isdir(steamcmd_path):
+    if engine == 'srcds' or engine == 'hlds' or engine == 'unreal' and os.path.isdir(steamcmd_path):
         # Check if the game is installed
         if os.path.isdir(gamedir):
             # CSGO
@@ -260,6 +286,12 @@ try:
                 gsmod = GSModServer(gsconfig = gameserver)
                 gsmod.start()
 
+            # Sven coop
+            elif steam_appid == '276060' and args.start:
+                gameserver = load_configuration(CONFIG_FILE)
+                svencoop = SvenCoopServer(gsconfig = gameserver)
+                svencoop.start()
+
             # Stop operations
             # CSGO
             if steam_appid == '740' and args.stop:
@@ -296,6 +328,12 @@ try:
                 gameserver = load_configuration(CONFIG_FILE)
                 gsmod = GSModServer(gsconfig = gameserver)
                 gsmod.stop()
+
+            # SvenCoop
+            elif steam_appid == '276060' and args.stop:
+                gameserver = load_configuration(CONFIG_FILE)
+                svencoop = SvenCoopServer(gsconfig = gameserver)
+                svencoop.stop()
 
             # Restart operations
             # CSGO
@@ -340,6 +378,12 @@ try:
                 gsmod = GSModServer(gsconfig = gameserver)
                 gsmod.stop()
                 gsmod.start()
+            # SvenCoop
+            elif steam_appid == '4020' and args.restart:
+                gameserver = load_configuration(CONFIG_FILE)
+                svencoop = SvenCoopServer(gsconfig = gameserver)
+                svencoop.stop()
+                svencoop.start()
         else:
             sys.exit("Game is not installed. Use the --update command to install the game files.")
 except (AttributeError, NameError):
