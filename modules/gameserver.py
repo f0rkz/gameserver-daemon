@@ -21,6 +21,7 @@ GAME = {
     '222860': 'left4dead2',
     '376030': 'ShooterGame',
     '4020': 'gsmod',
+    '276060', 'svencoop',
 }
 
 # Configuration parser variable. Don't touch this.
@@ -69,7 +70,7 @@ class GameServer(object):
             {'option': 'path', 'info': 'Gameserver base path: (example: /home/steam/mygame.mydomain.com) '},
             {'option': 'appid', 'info': 'Steam AppID: '},
             {'option': 'steamapi', 'info': 'Steam API Key (for workshop content) [none] ', 'default': 'ignore'},
-            {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds']},
+            {'option': 'engine', 'info': 'Gameserver engine (srcds / unreal / hlds): [srcds] ', 'default': 'srcds', 'valid_option': ['unreal', 'srcds', 'hlds']},
         ]
         steamcmd = {'id': 'steamcmd'}
         parser.add_section('steamcmd')
