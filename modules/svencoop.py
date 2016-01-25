@@ -112,7 +112,7 @@ class SvenCoopServer(GameServer):
                                map=self.gsconfig[steam_appid]['map']
                               )
         extra_parameters = ''
-        srcds_run = '{path}/svends_run {launch} {extra}' \
+        srcds_run = 'cd {path}; {path}/svends_run {launch} {extra}' \
                     .format(path=self.path['game'],
                             launch=srcds_launch,
                             extra=extra_parameters
