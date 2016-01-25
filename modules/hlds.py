@@ -155,6 +155,7 @@ class HLDS(GameServer):
             srcds_vars = self.gsconfig[appid]
 
             output = template.render(srcds_vars)
+            print output
 
             # svencoop support
             if appid == '276060':
