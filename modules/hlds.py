@@ -15,7 +15,7 @@ CONFIG_FILE = "server.conf"
 # Dictionary of game subdirectories for configuration
 # Also used for the game name in srcds launching
 GAME = {
-    '276060', 'svencoop',
+    '276060': 'svencoop',
 }
 
 class HLDS(GameServer):
@@ -155,7 +155,6 @@ class HLDS(GameServer):
             srcds_vars = self.gsconfig[appid]
 
             output = template.render(srcds_vars)
-            print output
 
             # svencoop support
             if appid == '276060':
