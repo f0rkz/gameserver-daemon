@@ -96,7 +96,7 @@ class SvenCoopServer(GameServer):
 
     def start(self):
         steam_appid = self.gsconfig['steamcmd']['appid']
-        srcds_launch = '-console -usercon ' \
+        srcds_launch = '-console -usercon -debug ' \
                        '-secure -autoupdate ' \
                        '-steam_dir {steam_dir} ' \
                        '-steamcmd_script {runscript} ' \
